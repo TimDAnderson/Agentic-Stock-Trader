@@ -33,10 +33,24 @@ no-API-key** core:
   `reconcile` rules, and a `TradingEngine` that runs **reconcile → route → decide
   → conditional-write** (idempotent orders, no double-buy).
 
+- ✅ **5. LangGraph reasoning** — a parallel data-gathering graph that assembles a
+  `MarketState` (fan-out indicators/context/news/events → assemble), a
+  Tree-of-Thought advisory subgraph (bull/bear/neutral → evaluator, biased to
+  veto) over an injected `LLMClient`, and the **veto-only merge** wired into the
+  engine (the LLM can downgrade a buy to do-nothing, never create one). Fakes
+  make it all network-free; `OpenRouterLLM` is the real client.
+
+- ✅ **6. Market-calendar gate + local runner** — a `MarketCalendar` gate (run
+  does nothing when closed/holiday/half-day) wired as the engine's first step,
+  and `run_once` (gather graph → engine) with a `build_local_engine` factory and
+  `examples/run_local.py` CLI to run the whole flow against Alpaca paper +
+  OpenRouter on your laptop. The full pipeline is tested end-to-end with fakes.
+
 Not built yet (each layers on top without touching the above):
 
-- ☐ 5. LangGraph reasoning — parallel gathering + ToT advisory (veto-only).
-- ☐ 6. CDK deployment — paper + live stacks, EventBridge, Secrets Manager, alarms.
+- ☐ 7. CDK deployment — paper + live stacks, EventBridge, Secrets Manager, alarms.
+- ☐ Data tools — real news / economic-calendar / VIX providers (today
+  `AlpacaMarketDataProvider` does bars→indicators; the rest return empty).
 
 ## Layout
 
@@ -48,7 +62,11 @@ src/trading_bot/
   backtest/     # replay historical MarketState snapshots through a strategy
   broker/       # Broker protocol + FakeBroker (tests) + AlpacaBroker (paper/live)
   state/        # StateRepository protocol + InMemory/DynamoDB + reconcile rules
-  engine.py     # TradingEngine: reconcile -> route -> decide -> conditional-write
+  reasoning/    # LangGraph: parallel gather -> MarketState, ToT advisory (veto-only)
+  data/         # MarketDataProvider implementations (AlpacaMarketDataProvider)
+  market_calendar.py  # is-the-market-open gate (Static + Alpaca)
+  engine.py     # TradingEngine: gate -> reconcile -> route -> decide -> veto -> write
+  runner.py     # run_once (gather -> engine) + build_local_engine factory
 tests/          # unit tests (pure, no AWS / broker / network)
 examples/       # runnable demos
 ```
@@ -68,17 +86,101 @@ uv run ruff check .     # lint
 uv run python examples/run_backtest.py   # synthetic end-to-end demo
 ```
 
-Phase-specific deps are kept out of the default install:
+Phase-specific deps are kept out of the default install (combine as needed):
 
 ```bash
-uv sync --extra broker     # alpaca-py        (phase 3)
-uv sync --extra aws        # boto3            (phase 4)
-uv sync --extra reasoning  # langgraph        (phase 5)
+uv sync --extra broker     # alpaca-py  — Alpaca broker, data, calendar (phase 3, 6)
+uv sync --extra aws        # boto3      — DynamoDB state (phase 4)
+uv sync --extra reasoning  # langgraph + httpx — LangGraph + OpenRouter (phase 5)
 ```
 
-## Secrets & config
+## Environment variables & secrets
 
-Secrets are stored **locally as environment variables** or in **AWS SSM Parameter
-Store** — never hardcoded. `StrategyConfig` loads from a dict (local JSON/YAML,
-SSM JSON, or a DynamoDB item) so tuning is a zero-deploy change; every config and
-strategy is versioned and stamped on each trade record.
+Secrets live **locally as environment variables** (and, when deployed, in **AWS
+Secrets Manager / SSM** — never hardcoded). Nothing below is needed for the unit
+tests or the synthetic backtest; they're only for runs that hit real services.
+
+| Variable | Used by | Required when |
+|---|---|---|
+| `ALPACA_PAPER_API_KEY` / `ALPACA_PAPER_SECRET_KEY` | Alpaca paper broker, data, calendar | any real/paper run (falls back to `ALPACA_API_KEY` / `ALPACA_SECRET_KEY`) |
+| `ALPACA_LIVE_API_KEY` / `ALPACA_LIVE_SECRET_KEY` | live trading | live mode only (phase 7+) — **not** needed locally |
+| `OPENROUTER_API_KEY` | OpenRouter advisory LLM | any run **with** the advisor (omit + use `--no-advisor` to skip) |
+| `OPENROUTER_MODEL` | OpenRouter advisory LLM | optional; default `openai/gpt-4o-mini` |
+| `DYNAMODB_TABLE` | runner state persistence | set to use DynamoDB instead of in-memory state |
+| `DYNAMODB_ENDPOINT` | DynamoDB client | set to DynamoDB Local (e.g. `http://localhost:8000`); table auto-created |
+| `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` | boto3 | required by boto3 even for DynamoDB Local — use dummy `local` / `local` |
+| `AWS_DEFAULT_REGION` | boto3 | optional; default `us-east-1` |
+
+Keys are **not interchangeable** between paper and live, and `mode` is explicit —
+the bot refuses to start if the keys don't match the intended endpoint.
+`StrategyConfig` loads from a dict (local JSON/YAML, SSM JSON, or a DynamoDB item),
+so tuning is a zero-deploy change; every config and strategy is versioned and
+stamped on each trade record.
+
+## Run locally against paper (market open)
+
+Dry-run the **real** flow on your laptop before deploying — e.g. on a Monday
+morning, to confirm it will actually place a paper order. This runs the same
+engine the Lambda will, against the Alpaca **paper** account, the LangGraph
+data-gather + advisory, and **DynamoDB Local** for state.
+
+```bash
+# 1. install the extras for a real run
+uv sync --extra broker --extra reasoning --extra aws
+
+# 2. credentials (paper account + OpenRouter)
+export ALPACA_PAPER_API_KEY=...      ALPACA_PAPER_SECRET_KEY=...
+export OPENROUTER_API_KEY=...        # or pass --no-advisor and skip this
+
+# 3. start DynamoDB Local and point the runner at it
+make dynamo-up                        # docker compose up -d dynamodb
+export DYNAMODB_ENDPOINT=http://localhost:8000
+export DYNAMODB_TABLE=trading-bot-local
+export AWS_ACCESS_KEY_ID=local  AWS_SECRET_ACCESS_KEY=local  AWS_DEFAULT_REGION=us-east-1
+
+# 4. (optional) confirm connectivity to the paper endpoint first
+uv run python examples/paper_smoke.py
+
+# 5. run the bot — one shot, or on a loop through the session
+uv run python examples/run_local.py                       # single run, right now
+uv run python examples/run_local.py --loop --interval 60  # every 60s while open
+```
+
+What happens each run: the **market-calendar gate** checks Alpaca's calendar — if
+the market is closed it does nothing. If open, it gathers bars → indicators,
+makes the deterministic decision, lets the advisory **veto** (not create) a buy,
+and — if it still decides to buy — places a **real bracket order** on your paper
+account. State (the buy-once/sell-once gate + the run/trade audit records) is
+written to DynamoDB Local. Because the strategy is biased toward `DO_NOTHING`, a
+"no trade" result is normal and not a failure.
+
+Inspect the persisted state/records with the optional admin UI:
+
+```bash
+docker compose --profile tools up -d   # dynamodb-admin at http://localhost:8001
+```
+
+> Skip DynamoDB entirely (in-memory state) by just not setting `DYNAMODB_TABLE` —
+> useful for a quick smoke run, but state won't survive across restarts.
+
+### Force an actual trade (validation only)
+
+The strategy is biased toward `DO_NOTHING`, so a normal run often won't trade —
+which makes it hard to confirm the *order* path works. `--force-entry` guarantees
+a real paper order so you can watch the full **buy → state → sell** cycle:
+
+```bash
+uv run python examples/run_local.py --force-entry
+```
+
+It swaps in a dev-only `ForceEntryStrategy` (always buys the bullish instrument,
+sized like the live rule but at least one share) and **disables the advisor** so
+the LLM can't veto it. The market-calendar gate **still applies** — it only fires
+a real order when the market is genuinely open, so run it during the session. The
+trade is stamped `strategy_version="force-entry"` in the audit records so it's
+obvious. After it fills, a normal exit (`MomentumStrategy`) manages and sells it,
+or the EOD liquidation flattens it.
+
+> ⚠️ `--force-entry` places a **real order on your paper account** and bypasses
+> all conviction gates. It is for pre-deploy validation only — never use it for a
+> deployed or live run.

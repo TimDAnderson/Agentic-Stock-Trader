@@ -1391,12 +1391,15 @@ broker = [
     { name = "alpaca-py" },
 ]
 reasoning = [
+    { name = "httpx" },
     { name = "langchain-core" },
     { name = "langgraph" },
 ]
 
 [package.dev-dependencies]
 dev = [
+    { name = "langchain-core" },
+    { name = "langgraph" },
     { name = "mypy" },
     { name = "pytest" },
     { name = "pytest-cov" },
@@ -1407,6 +1410,7 @@ dev = [
 requires-dist = [
     { name = "alpaca-py", marker = "extra == 'broker'", specifier = ">=0.21" },
     { name = "boto3", marker = "extra == 'aws'", specifier = ">=1.34" },
+    { name = "httpx", marker = "extra == 'reasoning'", specifier = ">=0.27" },
     { name = "langchain-core", marker = "extra == 'reasoning'", specifier = ">=0.3" },
     { name = "langgraph", marker = "extra == 'reasoning'", specifier = ">=0.2" },
     { name = "numpy", specifier = ">=1.26" },
@@ -1417,6 +1421,8 @@ provides-extras = ["broker", "aws", "reasoning"]
 
 [package.metadata.requires-dev]
 dev = [
+    { name = "langchain-core", specifier = ">=0.3" },
+    { name = "langgraph", specifier = ">=0.2" },
     { name = "mypy", specifier = ">=1.10" },
     { name = "pytest", specifier = ">=8.0" },
     { name = "pytest-cov", specifier = ">=5.0" },

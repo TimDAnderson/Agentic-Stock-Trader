@@ -6,7 +6,7 @@ the reconcile/route/decide/conditional-write flow is exercised with no network.
 
 from __future__ import annotations
 
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, date, datetime, timedelta
 from zoneinfo import ZoneInfo
 
 from trading_bot.broker import BrokerMode, FakeBroker
@@ -14,6 +14,8 @@ from trading_bot.domain.config import StrategyConfig
 from trading_bot.domain.decisions import EntryAction, EntryDecision, ExitDecision
 from trading_bot.domain.market_state import Indicators, MarketState, Position
 from trading_bot.engine import TradingEngine
+from trading_bot.market_calendar import StaticMarketCalendar
+from trading_bot.reasoning import FakeAdvisor, Recommendation
 from trading_bot.state import InMemoryStateRepository, PositionStatus
 
 ET = ZoneInfo('America/New_York')
@@ -147,6 +149,73 @@ def test_reconcile_marks_closed_when_broker_flat() -> None:
     assert run.alert is not None
     state = engine.repository.get_daily_state(run.trade_date)
     assert state is not None and state.status is PositionStatus.POSITION_CLOSED
+
+
+def test_advisor_veto_blocks_a_buy() -> None:
+    broker = FakeBroker(BrokerMode.PAPER, prices={'QQQ': 400.0})
+    engine = TradingEngine(
+        broker=broker,
+        repository=InMemoryStateRepository(),
+        strategy=StubStrategy(_buy(), ExitDecision.hold('x')),
+        config=StrategyConfig(),
+        advisor=FakeAdvisor(Recommendation.VETO, 'event risk'),
+        clock=FakeClock(),
+    )
+    run = engine.run(_state())
+    assert run.action == EntryAction.DO_NOTHING.value
+    assert run.status_after is PositionStatus.NO_POSITION
+    assert broker.get_positions() == []  # the veto prevented the order
+    assert run.advisory is not None and run.advisory['recommendation'] == 'VETO'
+    assert 'VETO' in run.reason
+
+
+def test_advisor_proceed_allows_a_buy() -> None:
+    broker = FakeBroker(BrokerMode.PAPER, prices={'QQQ': 400.0})
+    engine = TradingEngine(
+        broker=broker,
+        repository=InMemoryStateRepository(),
+        strategy=StubStrategy(_buy(), ExitDecision.hold('x')),
+        config=StrategyConfig(),
+        advisor=FakeAdvisor(Recommendation.PROCEED),
+        clock=FakeClock(),
+    )
+    run = engine.run(_state())
+    assert run.action == EntryAction.BUY_BULLISH.value
+    assert run.status_after is PositionStatus.POSITION_OPEN
+    assert run.advisory is not None and run.advisory['recommendation'] == 'PROCEED'
+
+
+def test_market_closed_gate_does_nothing() -> None:
+    broker = FakeBroker(BrokerMode.PAPER, prices={'QQQ': 400.0})
+    repo = InMemoryStateRepository()
+    engine = TradingEngine(
+        broker=broker,
+        repository=repo,
+        strategy=StubStrategy(_buy(), ExitDecision.hold('x')),
+        config=StrategyConfig(),
+        calendar=StaticMarketCalendar(),  # no sessions -> always closed
+        clock=FakeClock(),
+    )
+    run = engine.run(_state())
+    assert run.action == 'DO_NOTHING'
+    assert 'closed' in run.reason.lower()
+    assert broker.get_positions() == []
+    assert repo.get_daily_state(run.trade_date) is None  # no state row created when closed
+
+
+def test_market_open_gate_allows_run() -> None:
+    broker = FakeBroker(BrokerMode.PAPER, prices={'QQQ': 400.0})
+    engine = TradingEngine(
+        broker=broker,
+        repository=InMemoryStateRepository(),
+        strategy=StubStrategy(_buy(), ExitDecision.hold('x')),
+        config=StrategyConfig(),
+        calendar=StaticMarketCalendar.regular([date(2026, 6, 2)]),
+        clock=FakeClock(),
+    )
+    run = engine.run(_state())  # as_of 2026-06-02 10:00 ET — inside the session
+    assert run.action == EntryAction.BUY_BULLISH.value
+    assert run.status_after is PositionStatus.POSITION_OPEN
 
 
 def test_closed_day_is_terminal() -> None:

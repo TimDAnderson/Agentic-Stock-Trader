@@ -23,6 +23,7 @@ aws = [
 reasoning = [
     "langgraph>=0.2",
     "langchain-core>=0.3",
+    "httpx>=0.27",
 ]
 
 [dependency-groups]
@@ -31,6 +32,8 @@ dev = [
     "pytest-cov>=5.0",
     "ruff>=0.6",
     "mypy>=1.10",
+    "langgraph>=0.2",
+    "langchain-core>=0.3",
 ]
 
 [build-system]
@@ -74,6 +77,18 @@ ignore_missing_imports = true
 # boto3 is an optional extra, imported lazily; the DynamoDB adapter isolates it.
 [[tool.mypy.overrides]]
 module = ["boto3", "boto3.*", "botocore.*"]
+ignore_missing_imports = true
+
+# langgraph + httpx (reasoning extra) are isolated behind the reasoning modules.
+# langgraph ships its own (very strict, overload-heavy) types; skip analyzing it
+# and treat its surface as Any rather than fighting the StateGraph overloads.
+[[tool.mypy.overrides]]
+module = ["langgraph.*"]
+follow_imports = "skip"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = ["httpx"]
 ignore_missing_imports = true
 
 [tool.pydantic-mypy]

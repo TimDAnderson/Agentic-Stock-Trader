@@ -120,6 +120,11 @@ class AlpacaBroker(Broker):
         if verify:
             self._verify_account()
 
+    @property
+    def trading_client(self) -> Any:
+        """The underlying alpaca-py TradingClient (e.g. to share with the calendar)."""
+        return self._client
+
     def _verify_account(self) -> None:
         """Fetch the account so wrong keys/mode fail loudly before any order.
 

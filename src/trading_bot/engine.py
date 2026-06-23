@@ -24,6 +24,9 @@ from trading_bot.broker.ids import entry_id, exit_id
 from trading_bot.domain.config import StrategyConfig
 from trading_bot.domain.decisions import EntryDecision, ExitAction
 from trading_bot.domain.market_state import MarketState, Position
+from trading_bot.market_calendar import MarketCalendar, is_market_open
+from trading_bot.reasoning.advisor import Advisor, Advisory
+from trading_bot.reasoning.veto import apply_advisory
 from trading_bot.state.errors import ConcurrentTransitionError, StateAlreadyExistsError
 from trading_bot.state.models import DailyState, PositionStatus, RunRecord, TradeRecord
 from trading_bot.state.reconcile import ReconcileAction, reconcile
@@ -49,16 +52,35 @@ class TradingEngine:
         strategy: Strategy,
         config: StrategyConfig,
         *,
+        advisor: Advisor | None = None,
+        calendar: MarketCalendar | None = None,
         clock: Callable[[], datetime] | None = None,
     ) -> None:
         self.broker = broker
         self.repository = repository
         self.strategy = strategy
         self.config = config
+        self.advisor = advisor
+        self.calendar = calendar
         self._clock = clock or (lambda: datetime.now(UTC))
 
     def run(self, state: MarketState, *, trade_date: date | None = None) -> RunRecord:
         td = trade_date or _trade_date(state.as_of)
+
+        # Market-open gate first (DECISIONS.md §4): closed/holiday/half-day → do
+        # nothing, before any broker or DB write. Does not create a state row.
+        if self.calendar is not None and not is_market_open(self.calendar, state.as_of):
+            existing = self.repository.get_daily_state(td)
+            status = existing.status if existing else PositionStatus.NO_POSITION
+            return self._record(
+                td,
+                status_before=status,
+                status_after=status,
+                action='DO_NOTHING',
+                reason='Market closed (calendar gate).',
+                state=state,
+            )
+
         daily = self._get_or_create(td)
 
         # Reconcile against the broker (source of truth) before deciding anything.
@@ -105,6 +127,14 @@ class TradingEngine:
     # -- entry --------------------------------------------------------------
     def _enter(self, daily: DailyState, state: MarketState, td: date) -> RunRecord:
         decision = self.strategy.evaluate_entry(state, self.config)
+
+        # Advisory pass (veto-only): the LLM may downgrade a buy to do-nothing,
+        # never the reverse. The deterministic rule still holds the wheel.
+        advisory: Advisory | None = None
+        if decision.action.is_buy and self.advisor is not None:
+            advisory = self.advisor.advise(state, decision)
+            decision = apply_advisory(decision, advisory)
+
         if not decision.action.is_buy:
             return self._record(
                 td,
@@ -113,6 +143,7 @@ class TradingEngine:
                 action=decision.action.value,
                 reason=decision.reason,
                 state=state,
+                advisory=advisory,
             )
 
         symbol = self.config.instruments.symbol_for(decision.action)
@@ -166,6 +197,7 @@ class TradingEngine:
             reason=decision.reason,
             state=state,
             alert=None if fill is not None else 'Order submitted but no result returned.',
+            advisory=advisory,
         )
 
     # -- exit ---------------------------------------------------------------
@@ -312,6 +344,7 @@ class TradingEngine:
         reason: str,
         state: MarketState,
         alert: str | None = None,
+        advisory: Advisory | None = None,
     ) -> RunRecord:
         run = RunRecord(
             trade_date=trade_date,
@@ -323,6 +356,8 @@ class TradingEngine:
             strategy_version=self.strategy.version,
             mode=self.broker.mode,
             market_snapshot=self._snapshot(state),
+            advisory=advisory.model_dump(mode='json') if advisory else None,
+            llm_calls=advisory.llm_calls if advisory else None,
             alert=alert,
         )
         self.repository.append_run(run)
