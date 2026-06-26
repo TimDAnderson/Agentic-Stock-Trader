@@ -1,0 +1,23 @@
+# Keep the Lambda image lean and, critically, keep CDK's own output (cdk.out) and
+# the git tree OUT of the Docker build context — otherwise the asset staging
+# recursively copies cdk.out into itself (ENAMETOOLONG) on synth/deploy.
+.git
+.gitignore
+.venv
+**/__pycache__
+**/*.pyc
+**/*.pyo
+cdk.out
+infra/cdk.out
+infra
+.mypy_cache
+.pytest_cache
+.ruff_cache
+.idea
+.claude
+tests
+examples
+docker-compose.yml
+uv.lock
+*.md
+!README.md

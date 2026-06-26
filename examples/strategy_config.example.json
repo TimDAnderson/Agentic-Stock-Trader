@@ -1,0 +1,22 @@
+{
+  "version": "v1-local-test",
+  "instruments": {
+    "reference_symbol": "QQQ",
+    "bullish_symbol": "QQQ",
+    "bearish_symbol": "PSQ"
+  },
+  "no_entry_after": "14:30",
+  "min_relative_volume": 0.3,
+  "rsi_overbought": 70.0,
+  "rsi_oversold": 30.0,
+  "min_atr_pct": 0.001,
+  "target_position_usd": 10000.0,
+  "max_position_pct": 0.10,
+  "stop_loss_atr_multiple": 1.5,
+  "take_profit_atr_multiple": 3.0,
+  "min_stop_loss_pct": 0.01,
+  "force_exit_after": "15:55",
+  "moc_backstop_enabled": true,
+  "place_moc_after": "15:45",
+  "moc_cutoff": "15:50"
+}

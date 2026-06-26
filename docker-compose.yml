@@ -1,0 +1,36 @@
+# Local infrastructure for integration tests (DECISIONS.md §11).
+#
+#   docker compose up -d dynamodb           # start DynamoDB Local
+#   docker compose --profile tools up -d     # also start the dynamodb-admin UI
+#   docker compose down                      # stop everything
+#
+# DynamoDB Local is the only service the current (phase-4) integration tests
+# need. Alpaca's paper API is a real hosted HTTPS endpoint — it is NOT
+# containerized; hit it directly from the host (see examples/paper_smoke.py).
+
+services:
+  # In-memory DynamoDB. `-sharedDb` keeps everything in one DB file/namespace so
+  # the boto3 client sees the tables it creates; `-inMemory` means a clean slate
+  # on every restart (ideal for tests).
+  dynamodb:
+    image: amazon/dynamodb-local:2.5.2
+    container_name: trading-bot-dynamodb
+    command: ["-jar", "DynamoDBLocal.jar", "-sharedDb", "-inMemory"]
+    ports:
+      - "8000:8000"
+
+  # Optional web UI to inspect items at http://localhost:8001
+  # Started only with: docker compose --profile tools up -d
+  dynamodb-admin:
+    image: aaronshaf/dynamodb-admin:latest
+    container_name: trading-bot-dynamodb-admin
+    profiles: ["tools"]
+    ports:
+      - "8001:8001"
+    environment:
+      DYNAMO_ENDPOINT: http://dynamodb:8000
+      AWS_REGION: us-east-1
+      AWS_ACCESS_KEY_ID: local
+      AWS_SECRET_ACCESS_KEY: local
+    depends_on:
+      - dynamodb
