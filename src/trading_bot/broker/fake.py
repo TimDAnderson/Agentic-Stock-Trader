@@ -46,6 +46,7 @@ class FakeBroker(Broker):
         self._prices: dict[str, float] = dict(prices or {})
         self._positions: dict[str, BrokerPosition] = {}
         self._orders: dict[str, OrderResult] = {}  # keyed by client_order_id
+        self._resting_moc: dict[str, tuple[str, int]] = {}  # coid -> (symbol, qty)
         self._ids = count(1)
 
     # -- test/local controls ------------------------------------------------
@@ -113,8 +114,9 @@ class FakeBroker(Broker):
     def submit_moc_sell(self, symbol: str, qty: int, client_order_id: str) -> OrderResult:
         if client_order_id in self._orders:
             raise DuplicateClientOrderIdError(f'Order {client_order_id!r} already submitted.')
-        # Modeled as accepted-and-resting until the close; fills flat the position.
-        self._close_symbol(symbol, qty)
+        # A MOC *rests* until the closing auction — the position is NOT flattened
+        # now. Call settle_market_on_close() to simulate the close filling it.
+        self._resting_moc[client_order_id] = (symbol, qty)
         return self._store(
             OrderResult(
                 id=self._new_id(),
@@ -122,14 +124,37 @@ class FakeBroker(Broker):
                 symbol=symbol,
                 side=OrderSide.SELL,
                 qty=qty,
-                status=OrderStatus.FILLED,
-                filled_qty=qty,
-                filled_avg_price=self._prices.get(symbol),
+                status=OrderStatus.NEW,
+                filled_qty=0,
+                filled_avg_price=None,
                 submitted_at=datetime.now(UTC),
             )
         )
 
+    def settle_market_on_close(self) -> list[OrderResult]:
+        """Test control: simulate the closing auction filling resting MOC sells.
+
+        Proves the EOD backstop survives a dead Lambda — the position flattens
+        with no further engine run.
+        """
+        filled: list[OrderResult] = []
+        for coid, (symbol, qty) in list(self._resting_moc.items()):
+            self._close_symbol(symbol, qty)
+            order = self._orders[coid].model_copy(
+                update={
+                    'status': OrderStatus.FILLED,
+                    'filled_qty': qty,
+                    'filled_avg_price': self._prices.get(symbol),
+                }
+            )
+            self._orders[coid] = order
+            filled.append(order)
+        self._resting_moc.clear()
+        return filled
+
     def close_all_positions(self, *, cancel_orders: bool = True) -> list[OrderResult]:
+        if cancel_orders:
+            self._resting_moc.clear()  # an immediate liquidation supersedes the MOC
         results: list[OrderResult] = []
         for symbol, pos in list(self._positions.items()):
             price = self._prices.get(symbol, pos.avg_entry_price)

@@ -1,0 +1,1053 @@
+Trading-bot runs — last 2 day(s): 80 runs
+Log group: TradingBotPaper-FnLogs3EE1EAE0-tnA46tVXZkJZ
+Generated: 2026-06-25T23:44:54.939Z
+========================================================================================
+
+SUMMARY
+TIMESTAMP (UTC)           ACTION        TRADE_DATE   REASON
+----------------------------------------------------------------------------------------
+2026-06-24T13:01:11.956Z  DO_NOTHING    2026-06-24   Market closed (calendar gate).
+2026-06-24T13:15:51.246Z  DO_NOTHING    2026-06-24   Market closed (calendar gate).
+2026-06-24T13:30:50.222Z  DO_NOTHING    2026-06-24   Relative volume 0.00 below min 1.00 — no conviction.
+2026-06-24T13:46:00.451Z  DO_NOTHING    2026-06-24   Advisory VETO: VETO (deterministic was BUY_BEARISH: BUY_BEARISH: 19 PSQ @ ~$25.85 (~$491), stop $25.79 (1.5x ATR 0.04), take $25.98.)
+2026-06-24T14:00:50.738Z  DO_NOTHING    2026-06-24   Relative volume 0.85 below min 1.00 — no conviction.
+2026-06-24T14:15:50.413Z  DO_NOTHING    2026-06-24   Relative volume 0.50 below min 1.00 — no conviction.
+2026-06-24T14:30:50.298Z  DO_NOTHING    2026-06-24   Relative volume 0.18 below min 1.00 — no conviction.
+2026-06-24T14:45:50.502Z  DO_NOTHING    2026-06-24   Mixed QQQ signals (price/vwap/ema/macd/rsi not aligned; rsi=61).
+2026-06-24T15:00:49.928Z  DO_NOTHING    2026-06-24   QQQ too quiet (ATR%% below 0.100%).
+2026-06-24T15:15:50.401Z  DO_NOTHING    2026-06-24   Relative volume 0.92 below min 1.00 — no conviction.
+2026-06-24T15:30:50.884Z  DO_NOTHING    2026-06-24   QQQ too quiet (ATR%% below 0.100%).
+2026-06-24T15:45:50.189Z  DO_NOTHING    2026-06-24   QQQ too quiet (ATR%% below 0.100%).
+2026-06-24T16:00:50.281Z  DO_NOTHING    2026-06-24   Relative volume 0.49 below min 1.00 — no conviction.
+2026-06-24T16:15:50.603Z  DO_NOTHING    2026-06-24   QQQ too quiet (ATR%% below 0.100%).
+2026-06-24T16:30:50.713Z  DO_NOTHING    2026-06-24   Relative volume 0.35 below min 1.00 — no conviction.
+2026-06-24T16:45:50.310Z  DO_NOTHING    2026-06-24   Relative volume 0.42 below min 1.00 — no conviction.
+2026-06-24T17:00:51.505Z  DO_NOTHING    2026-06-24   Relative volume 0.35 below min 1.00 — no conviction.
+2026-06-24T17:15:50.128Z  DO_NOTHING    2026-06-24   Relative volume 0.16 below min 1.00 — no conviction.
+2026-06-24T17:30:50.130Z  DO_NOTHING    2026-06-24   QQQ too quiet (ATR%% below 0.100%).
+2026-06-24T17:45:50.147Z  DO_NOTHING    2026-06-24   Relative volume 0.92 below min 1.00 — no conviction.
+2026-06-24T18:00:51.376Z  DO_NOTHING    2026-06-24   Relative volume 0.39 below min 1.00 — no conviction.
+2026-06-24T18:15:50.426Z  DO_NOTHING    2026-06-24   Relative volume 0.94 below min 1.00 — no conviction.
+2026-06-24T18:30:49.848Z  DO_NOTHING    2026-06-24   After entry cutoff 14:30 ET (now 14:30).
+2026-06-24T18:45:50.003Z  DO_NOTHING    2026-06-24   After entry cutoff 14:30 ET (now 14:45).
+2026-06-24T19:00:50.487Z  DO_NOTHING    2026-06-24   After entry cutoff 14:30 ET (now 15:00).
+2026-06-24T19:15:50.061Z  DO_NOTHING    2026-06-24   After entry cutoff 14:30 ET (now 15:15).
+2026-06-24T19:30:50.760Z  DO_NOTHING    2026-06-24   After entry cutoff 14:30 ET (now 15:30).
+2026-06-24T19:45:50.356Z  DO_NOTHING    2026-06-24   After entry cutoff 14:30 ET (now 15:45).
+2026-06-24T19:47:14.461Z  DO_NOTHING    2026-06-24   After entry cutoff 14:30 ET (now 15:47).
+2026-06-24T19:56:21.749Z  DO_NOTHING    2026-06-24   After entry cutoff 14:30 ET (now 15:56).
+2026-06-24T20:00:50.055Z  DO_NOTHING    2026-06-24   Market closed (calendar gate).
+2026-06-24T20:15:50.243Z  DO_NOTHING    2026-06-24   Market closed (calendar gate).
+2026-06-24T20:30:50.143Z  DO_NOTHING    2026-06-24   Market closed (calendar gate).
+2026-06-24T20:45:50.466Z  DO_NOTHING    2026-06-24   Market closed (calendar gate).
+2026-06-24T20:47:10.785Z  DO_NOTHING    2026-06-24   Market closed (calendar gate).
+2026-06-24T20:56:22.188Z  DO_NOTHING    2026-06-24   Market closed (calendar gate).
+2026-06-24T21:00:50.152Z  DO_NOTHING    2026-06-24   Market closed (calendar gate).
+2026-06-24T21:15:50.009Z  DO_NOTHING    2026-06-24   Market closed (calendar gate).
+2026-06-24T21:30:50.410Z  DO_NOTHING    2026-06-24   Market closed (calendar gate).
+2026-06-24T21:45:49.862Z  DO_NOTHING    2026-06-24   Market closed (calendar gate).
+2026-06-25T13:00:50.577Z  DO_NOTHING    2026-06-25   Market closed (calendar gate).
+2026-06-25T13:15:50.001Z  DO_NOTHING    2026-06-25   Market closed (calendar gate).
+2026-06-25T13:30:52.504Z  DO_NOTHING    2026-06-25   Relative volume 0.38 below min 1.00 — no conviction.
+2026-06-25T13:45:50.372Z  DO_NOTHING    2026-06-25   Mixed QQQ signals (price/vwap/ema/macd/rsi not aligned; rsi=27).
+2026-06-25T14:00:49.908Z  DO_NOTHING    2026-06-25   Relative volume 0.46 below min 1.00 — no conviction.
+2026-06-25T14:15:50.647Z  DO_NOTHING    2026-06-25   Relative volume 0.64 below min 1.00 — no conviction.
+2026-06-25T14:30:50.303Z  DO_NOTHING    2026-06-25   Relative volume 0.13 below min 1.00 — no conviction.
+2026-06-25T14:45:50.567Z  DO_NOTHING    2026-06-25   Relative volume 0.88 below min 1.00 — no conviction.
+2026-06-25T15:00:57.408Z  DO_NOTHING    2026-06-25   Advisory VETO: VETO (deterministic was BUY_BEARISH: BUY_BEARISH: 19 PSQ @ ~$25.84 (~$491), stop $25.79 (1.5x ATR 0.03), take $25.93.)
+2026-06-25T15:15:57.521Z  DO_NOTHING    2026-06-25   Advisory VETO: VETO (deterministic was BUY_BEARISH: BUY_BEARISH: 19 PSQ @ ~$25.93 (~$493), stop $25.88 (1.5x ATR 0.03), take $26.01.)
+2026-06-25T15:30:50.197Z  DO_NOTHING    2026-06-25   Relative volume 0.77 below min 1.00 — no conviction.
+2026-06-25T15:45:49.572Z  DO_NOTHING    2026-06-25   Sizing yields <1 share of QQQ (notional $500 / $714.85).
+2026-06-25T16:00:50.385Z  DO_NOTHING    2026-06-25   QQQ too quiet (ATR%% below 0.100%).
+2026-06-25T16:15:50.489Z  DO_NOTHING    2026-06-25   QQQ too quiet (ATR%% below 0.100%).
+2026-06-25T16:30:50.371Z  DO_NOTHING    2026-06-25   Relative volume 0.20 below min 1.00 — no conviction.
+2026-06-25T16:45:50.497Z  DO_NOTHING    2026-06-25   Relative volume 0.27 below min 1.00 — no conviction.
+2026-06-25T17:00:50.439Z  DO_NOTHING    2026-06-25   Relative volume 0.20 below min 1.00 — no conviction.
+2026-06-25T17:15:50.279Z  DO_NOTHING    2026-06-25   Relative volume 0.78 below min 1.00 — no conviction.
+2026-06-25T17:30:50.806Z  DO_NOTHING    2026-06-25   Relative volume 0.10 below min 1.00 — no conviction.
+2026-06-25T17:45:50.087Z  DO_NOTHING    2026-06-25   QQQ too quiet (ATR%% below 0.100%).
+2026-06-25T18:00:50.327Z  DO_NOTHING    2026-06-25   QQQ too quiet (ATR%% below 0.100%).
+2026-06-25T18:15:49.992Z  DO_NOTHING    2026-06-25   Relative volume 0.33 below min 1.00 — no conviction.
+2026-06-25T18:30:49.992Z  DO_NOTHING    2026-06-25   After entry cutoff 14:30 ET (now 14:30).
+2026-06-25T18:45:50.667Z  DO_NOTHING    2026-06-25   After entry cutoff 14:30 ET (now 14:45).
+2026-06-25T19:00:50.544Z  DO_NOTHING    2026-06-25   After entry cutoff 14:30 ET (now 15:00).
+2026-06-25T19:15:49.978Z  DO_NOTHING    2026-06-25   After entry cutoff 14:30 ET (now 15:15).
+2026-06-25T19:30:50.182Z  DO_NOTHING    2026-06-25   After entry cutoff 14:30 ET (now 15:30).
+2026-06-25T19:45:50.230Z  DO_NOTHING    2026-06-25   After entry cutoff 14:30 ET (now 15:45).
+2026-06-25T19:47:14.441Z  DO_NOTHING    2026-06-25   After entry cutoff 14:30 ET (now 15:47).
+2026-06-25T19:56:22.273Z  DO_NOTHING    2026-06-25   After entry cutoff 14:30 ET (now 15:56).
+2026-06-25T20:00:49.880Z  DO_NOTHING    2026-06-25   Market closed (calendar gate).
+2026-06-25T20:15:49.945Z  DO_NOTHING    2026-06-25   Market closed (calendar gate).
+2026-06-25T20:30:50.003Z  DO_NOTHING    2026-06-25   Market closed (calendar gate).
+2026-06-25T20:45:50.032Z  DO_NOTHING    2026-06-25   Market closed (calendar gate).
+2026-06-25T20:47:10.761Z  DO_NOTHING    2026-06-25   Market closed (calendar gate).
+2026-06-25T20:56:22.575Z  DO_NOTHING    2026-06-25   Market closed (calendar gate).
+2026-06-25T21:00:49.972Z  DO_NOTHING    2026-06-25   Market closed (calendar gate).
+2026-06-25T21:15:50.069Z  DO_NOTHING    2026-06-25   Market closed (calendar gate).
+2026-06-25T21:30:50.073Z  DO_NOTHING    2026-06-25   Market closed (calendar gate).
+2026-06-25T21:45:51.015Z  DO_NOTHING    2026-06-25   Market closed (calendar gate).
+
+========================================================================================
+
+DETAIL
+
+[INFO]	2026-06-24T13:01:11.956Z	e925f10d-9a4e-4dde-815d-f537a2809fc0
+{
+    "mode": "paper",
+    "trade_date": "2026-06-24",
+    "action": "DO_NOTHING",
+    "reason": "Market closed (calendar gate).",
+    "status_before": "NO_POSITION",
+    "status_after": "NO_POSITION",
+    "alert": null,
+    "duration_ms": 24641.5
+}
+
+[INFO]	2026-06-24T13:15:51.246Z	96e6b293-94d6-4d9a-af9f-2fa7c3c21122
+{
+    "mode": "paper",
+    "trade_date": "2026-06-24",
+    "action": "DO_NOTHING",
+    "reason": "Market closed (calendar gate).",
+    "status_before": "NO_POSITION",
+    "status_after": "NO_POSITION",
+    "alert": null,
+    "duration_ms": 4146.6
+}
+
+[INFO]	2026-06-24T13:30:50.222Z	90eb6abd-23a7-4a4f-b572-8100c33d7796
+{
+    "mode": "paper",
+    "trade_date": "2026-06-24",
+    "action": "DO_NOTHING",
+    "reason": "Relative volume 0.00 below min 1.00 \u2014 no conviction.",
+    "status_before": "NO_POSITION",
+    "status_after": "NO_POSITION",
+    "alert": null,
+    "duration_ms": 3522.7
+}
+
+[INFO]	2026-06-24T13:46:00.450Z	7ddaf692-c44d-4a84-a351-c4a96c1e763c
+{
+    "mode": "paper",
+    "trade_date": "2026-06-24",
+    "action": "DO_NOTHING",
+    "reason": "Advisory VETO: VETO (deterministic was BUY_BEARISH: BUY_BEARISH: 19 PSQ @ ~$25.85 (~$491), stop $25.79 (1.5x ATR 0.04), take $25.98.)",
+    "status_before": "NO_POSITION",
+    "status_after": "NO_POSITION",
+    "alert": null,
+    "duration_ms": 13472.1
+}
+
+[INFO]	2026-06-24T14:00:50.738Z	47bb9414-28c0-41d7-a4b3-1f30219010b5
+{
+    "mode": "paper",
+    "trade_date": "2026-06-24",
+    "action": "DO_NOTHING",
+    "reason": "Relative volume 0.85 below min 1.00 \u2014 no conviction.",
+    "status_before": "NO_POSITION",
+    "status_after": "NO_POSITION",
+    "alert": null,
+    "duration_ms": 3558.6
+}
+
+[INFO]	2026-06-24T14:15:50.413Z	20052169-a4b5-494f-bd83-b3efa6841cf9
+{
+    "mode": "paper",
+    "trade_date": "2026-06-24",
+    "action": "DO_NOTHING",
+    "reason": "Relative volume 0.50 below min 1.00 \u2014 no conviction.",
+    "status_before": "NO_POSITION",
+    "status_after": "NO_POSITION",
+    "alert": null,
+    "duration_ms": 3412.4
+}
+
+[INFO]	2026-06-24T14:30:50.297Z	0fd1de8a-a53e-4c5d-a1d9-e07e0aecae32
+{
+    "mode": "paper",
+    "trade_date": "2026-06-24",
+    "action": "DO_NOTHING",
+    "reason": "Relative volume 0.18 below min 1.00 \u2014 no conviction.",
+    "status_before": "NO_POSITION",
+    "status_after": "NO_POSITION",
+    "alert": null,
+    "duration_ms": 3623.4
+}
+
+[INFO]	2026-06-24T14:45:50.502Z	f3f0fccf-2c72-48b5-b4fb-787976aff00f
+{
+    "mode": "paper",
+    "trade_date": "2026-06-24",
+    "action": "DO_NOTHING",
+    "reason": "Mixed QQQ signals (price/vwap/ema/macd/rsi not aligned; rsi=61).",
+    "status_before": "NO_POSITION",
+    "status_after": "NO_POSITION",
+    "alert": null,
+    "duration_ms": 3739.3
+}
+
+[INFO]	2026-06-24T15:00:49.928Z	10f5eedb-af92-4dd0-b87a-c0e543ea48a1
+{
+    "mode": "paper",
+    "trade_date": "2026-06-24",
+    "action": "DO_NOTHING",
+    "reason": "QQQ too quiet (ATR%% below 0.100%).",
+    "status_before": "NO_POSITION",
+    "status_after": "NO_POSITION",
+    "alert": null,
+    "duration_ms": 3237.0
+}
+
+[INFO]	2026-06-24T15:15:50.401Z	a79f824c-be01-4c95-92b5-d735e2925374
+{
+    "mode": "paper",
+    "trade_date": "2026-06-24",
+    "action": "DO_NOTHING",
+    "reason": "Relative volume 0.92 below min 1.00 \u2014 no conviction.",
+    "status_before": "NO_POSITION",
+    "status_after": "NO_POSITION",
+    "alert": null,
+    "duration_ms": 3630.9
+}
+
+[INFO]	2026-06-24T15:30:50.884Z	4a3cc491-2830-491d-ad7e-920f916cb9d9
+{
+    "mode": "paper",
+    "trade_date": "2026-06-24",
+    "action": "DO_NOTHING",
+    "reason": "QQQ too quiet (ATR%% below 0.100%).",
+    "status_before": "NO_POSITION",
+    "status_after": "NO_POSITION",
+    "alert": null,
+    "duration_ms": 3819.4
+}
+
+[INFO]	2026-06-24T15:45:50.189Z	02e9e4f9-9dda-4470-aa84-3bc700078efd
+{
+    "mode": "paper",
+    "trade_date": "2026-06-24",
+    "action": "DO_NOTHING",
+    "reason": "QQQ too quiet (ATR%% below 0.100%).",
+    "status_before": "NO_POSITION",
+    "status_after": "NO_POSITION",
+    "alert": null,
+    "duration_ms": 3399.4
+}
+
+[INFO]	2026-06-24T16:00:50.281Z	28085522-774f-46f8-8a57-ebe5eb5c22f2
+{
+    "mode": "paper",
+    "trade_date": "2026-06-24",
+    "action": "DO_NOTHING",
+    "reason": "Relative volume 0.49 below min 1.00 \u2014 no conviction.",
+    "status_before": "NO_POSITION",
+    "status_after": "NO_POSITION",
+    "alert": null,
+    "duration_ms": 3481.6
+}
+
+[INFO]	2026-06-24T16:15:50.602Z	dfc58a0b-a28b-413a-aeeb-4f48cf6285bb
+{
+    "mode": "paper",
+    "trade_date": "2026-06-24",
+    "action": "DO_NOTHING",
+    "reason": "QQQ too quiet (ATR%% below 0.100%).",
+    "status_before": "NO_POSITION",
+    "status_after": "NO_POSITION",
+    "alert": null,
+    "duration_ms": 3757.3
+}
+
+[INFO]	2026-06-24T16:30:50.713Z	ba176c3c-42c5-417f-9f4d-3f7810eff502
+{
+    "mode": "paper",
+    "trade_date": "2026-06-24",
+    "action": "DO_NOTHING",
+    "reason": "Relative volume 0.35 below min 1.00 \u2014 no conviction.",
+    "status_before": "NO_POSITION",
+    "status_after": "NO_POSITION",
+    "alert": null,
+    "duration_ms": 3853.0
+}
+
+[INFO]	2026-06-24T16:45:50.309Z	72f68774-6a79-4891-b5f6-d75ebcddd68d
+{
+    "mode": "paper",
+    "trade_date": "2026-06-24",
+    "action": "DO_NOTHING",
+    "reason": "Relative volume 0.42 below min 1.00 \u2014 no conviction.",
+    "status_before": "NO_POSITION",
+    "status_after": "NO_POSITION",
+    "alert": null,
+    "duration_ms": 3468.2
+}
+
+[INFO]	2026-06-24T17:00:51.505Z	f239904b-92b3-4c4b-aeb9-fa20a51d886f
+{
+    "mode": "paper",
+    "trade_date": "2026-06-24",
+    "action": "DO_NOTHING",
+    "reason": "Relative volume 0.35 below min 1.00 \u2014 no conviction.",
+    "status_before": "NO_POSITION",
+    "status_after": "NO_POSITION",
+    "alert": null,
+    "duration_ms": 4391.6
+}
+
+[INFO]	2026-06-24T17:15:50.128Z	e8c936e1-17a7-4e0a-b2dd-62d79e45e8f8
+{
+    "mode": "paper",
+    "trade_date": "2026-06-24",
+    "action": "DO_NOTHING",
+    "reason": "Relative volume 0.16 below min 1.00 \u2014 no conviction.",
+    "status_before": "NO_POSITION",
+    "status_after": "NO_POSITION",
+    "alert": null,
+    "duration_ms": 3396.4
+}
+
+[INFO]	2026-06-24T17:30:50.130Z	2590b881-1778-4850-b531-546a3a18f546
+{
+    "mode": "paper",
+    "trade_date": "2026-06-24",
+    "action": "DO_NOTHING",
+    "reason": "QQQ too quiet (ATR%% below 0.100%).",
+    "status_before": "NO_POSITION",
+    "status_after": "NO_POSITION",
+    "alert": null,
+    "duration_ms": 3348.5
+}
+
+[INFO]	2026-06-24T17:45:50.147Z	8539721a-e895-4335-8697-6edc393d894a
+{
+    "mode": "paper",
+    "trade_date": "2026-06-24",
+    "action": "DO_NOTHING",
+    "reason": "Relative volume 0.92 below min 1.00 \u2014 no conviction.",
+    "status_before": "NO_POSITION",
+    "status_after": "NO_POSITION",
+    "alert": null,
+    "duration_ms": 3450.9
+}
+
+[INFO]	2026-06-24T18:00:51.376Z	d4cfbdc8-033b-431d-bdfe-aa3162afe247
+{
+    "mode": "paper",
+    "trade_date": "2026-06-24",
+    "action": "DO_NOTHING",
+    "reason": "Relative volume 0.39 below min 1.00 \u2014 no conviction.",
+    "status_before": "NO_POSITION",
+    "status_after": "NO_POSITION",
+    "alert": null,
+    "duration_ms": 4312.0
+}
+
+[INFO]	2026-06-24T18:15:50.426Z	c3ba792c-c0b1-4a94-9dbc-ae1bfed11e54
+{
+    "mode": "paper",
+    "trade_date": "2026-06-24",
+    "action": "DO_NOTHING",
+    "reason": "Relative volume 0.94 below min 1.00 \u2014 no conviction.",
+    "status_before": "NO_POSITION",
+    "status_after": "NO_POSITION",
+    "alert": null,
+    "duration_ms": 3660.1
+}
+
+[INFO]	2026-06-24T18:30:49.847Z	ea96c828-20c4-45c4-881f-732d94e8d064
+{
+    "mode": "paper",
+    "trade_date": "2026-06-24",
+    "action": "DO_NOTHING",
+    "reason": "After entry cutoff 14:30 ET (now 14:30).",
+    "status_before": "NO_POSITION",
+    "status_after": "NO_POSITION",
+    "alert": null,
+    "duration_ms": 3148.1
+}
+
+[INFO]	2026-06-24T18:45:50.003Z	7b5c77ac-42ca-400a-a026-83c2118cd06b
+{
+    "mode": "paper",
+    "trade_date": "2026-06-24",
+    "action": "DO_NOTHING",
+    "reason": "After entry cutoff 14:30 ET (now 14:45).",
+    "status_before": "NO_POSITION",
+    "status_after": "NO_POSITION",
+    "alert": null,
+    "duration_ms": 3371.1
+}
+
+[INFO]	2026-06-24T19:00:50.487Z	0d85ed07-3823-4904-a4df-c8a37c32f023
+{
+    "mode": "paper",
+    "trade_date": "2026-06-24",
+    "action": "DO_NOTHING",
+    "reason": "After entry cutoff 14:30 ET (now 15:00).",
+    "status_before": "NO_POSITION",
+    "status_after": "NO_POSITION",
+    "alert": null,
+    "duration_ms": 3718.3
+}
+
+[INFO]	2026-06-24T19:15:50.061Z	5d1b7c4d-8948-4275-9cc7-bc806666d365
+{
+    "mode": "paper",
+    "trade_date": "2026-06-24",
+    "action": "DO_NOTHING",
+    "reason": "After entry cutoff 14:30 ET (now 15:15).",
+    "status_before": "NO_POSITION",
+    "status_after": "NO_POSITION",
+    "alert": null,
+    "duration_ms": 3333.1
+}
+
+[INFO]	2026-06-24T19:30:50.760Z	4094aaa0-664f-421e-947b-0717c28002d9
+{
+    "mode": "paper",
+    "trade_date": "2026-06-24",
+    "action": "DO_NOTHING",
+    "reason": "After entry cutoff 14:30 ET (now 15:30).",
+    "status_before": "NO_POSITION",
+    "status_after": "NO_POSITION",
+    "alert": null,
+    "duration_ms": 3853.4
+}
+
+[INFO]	2026-06-24T19:45:50.356Z	ea96416a-b2be-488f-b841-63ade82d634b
+{
+    "mode": "paper",
+    "trade_date": "2026-06-24",
+    "action": "DO_NOTHING",
+    "reason": "After entry cutoff 14:30 ET (now 15:45).",
+    "status_before": "NO_POSITION",
+    "status_after": "NO_POSITION",
+    "alert": null,
+    "duration_ms": 3548.5
+}
+
+[INFO]	2026-06-24T19:47:14.461Z	88e57c05-30d4-4fd6-ba0c-4f1867b0e240
+{
+    "mode": "paper",
+    "trade_date": "2026-06-24",
+    "action": "DO_NOTHING",
+    "reason": "After entry cutoff 14:30 ET (now 15:47).",
+    "status_before": "NO_POSITION",
+    "status_after": "NO_POSITION",
+    "alert": null,
+    "duration_ms": 3627.9
+}
+
+[INFO]	2026-06-24T19:56:21.749Z	93150edb-2982-496f-9e16-0aeb9c852e18
+{
+    "mode": "paper",
+    "trade_date": "2026-06-24",
+    "action": "DO_NOTHING",
+    "reason": "After entry cutoff 14:30 ET (now 15:56).",
+    "status_before": "NO_POSITION",
+    "status_after": "NO_POSITION",
+    "alert": null,
+    "duration_ms": 3201.8
+}
+
+[INFO]	2026-06-24T20:00:50.055Z	efae9a79-d42d-420f-95bd-20c4243e4286
+{
+    "mode": "paper",
+    "trade_date": "2026-06-24",
+    "action": "DO_NOTHING",
+    "reason": "Market closed (calendar gate).",
+    "status_before": "NO_POSITION",
+    "status_after": "NO_POSITION",
+    "alert": null,
+    "duration_ms": 3470.6
+}
+
+[INFO]	2026-06-24T20:15:50.241Z	a2549b79-f180-4cf9-9538-758c798870d7
+{
+    "mode": "paper",
+    "trade_date": "2026-06-24",
+    "action": "DO_NOTHING",
+    "reason": "Market closed (calendar gate).",
+    "status_before": "NO_POSITION",
+    "status_after": "NO_POSITION",
+    "alert": null,
+    "duration_ms": 3550.6
+}
+
+[INFO]	2026-06-24T20:30:50.143Z	b0a71604-9d38-4f65-89fd-99bf9e2d78f9
+{
+    "mode": "paper",
+    "trade_date": "2026-06-24",
+    "action": "DO_NOTHING",
+    "reason": "Market closed (calendar gate).",
+    "status_before": "NO_POSITION",
+    "status_after": "NO_POSITION",
+    "alert": null,
+    "duration_ms": 3329.3
+}
+
+[INFO]	2026-06-24T20:45:50.466Z	d7493954-d821-4c3c-b4f7-ac16869bdaa6
+{
+    "mode": "paper",
+    "trade_date": "2026-06-24",
+    "action": "DO_NOTHING",
+    "reason": "Market closed (calendar gate).",
+    "status_before": "NO_POSITION",
+    "status_after": "NO_POSITION",
+    "alert": null,
+    "duration_ms": 3665.0
+}
+
+[INFO]	2026-06-24T20:47:10.785Z	8a785bb2-f2d2-4077-8f93-f0834e83bde7
+{
+    "mode": "paper",
+    "trade_date": "2026-06-24",
+    "action": "DO_NOTHING",
+    "reason": "Market closed (calendar gate).",
+    "status_before": "NO_POSITION",
+    "status_after": "NO_POSITION",
+    "alert": null,
+    "duration_ms": 529.8
+}
+
+[INFO]	2026-06-24T20:56:22.187Z	f3f37861-7f33-4619-a491-0cec3b5673ea
+{
+    "mode": "paper",
+    "trade_date": "2026-06-24",
+    "action": "DO_NOTHING",
+    "reason": "Market closed (calendar gate).",
+    "status_before": "NO_POSITION",
+    "status_after": "NO_POSITION",
+    "alert": null,
+    "duration_ms": 3298.4
+}
+
+[INFO]	2026-06-24T21:00:50.151Z	3ecfe8cf-c681-4dad-9eac-fb312721b5a6
+{
+    "mode": "paper",
+    "trade_date": "2026-06-24",
+    "action": "DO_NOTHING",
+    "reason": "Market closed (calendar gate).",
+    "status_before": "NO_POSITION",
+    "status_after": "NO_POSITION",
+    "alert": null,
+    "duration_ms": 3487.9
+}
+
+[INFO]	2026-06-24T21:15:50.009Z	ac80cb89-ed50-47f4-bd37-2aefee9afe7e
+{
+    "mode": "paper",
+    "trade_date": "2026-06-24",
+    "action": "DO_NOTHING",
+    "reason": "Market closed (calendar gate).",
+    "status_before": "NO_POSITION",
+    "status_after": "NO_POSITION",
+    "alert": null,
+    "duration_ms": 3333.0
+}
+
+[INFO]	2026-06-24T21:30:50.410Z	6486844a-8b40-487d-8286-0e6c26380693
+{
+    "mode": "paper",
+    "trade_date": "2026-06-24",
+    "action": "DO_NOTHING",
+    "reason": "Market closed (calendar gate).",
+    "status_before": "NO_POSITION",
+    "status_after": "NO_POSITION",
+    "alert": null,
+    "duration_ms": 3527.1
+}
+
+[INFO]	2026-06-24T21:45:49.862Z	9b1d93f7-568e-4af1-aaa0-802caf7e3c9e
+{
+    "mode": "paper",
+    "trade_date": "2026-06-24",
+    "action": "DO_NOTHING",
+    "reason": "Market closed (calendar gate).",
+    "status_before": "NO_POSITION",
+    "status_after": "NO_POSITION",
+    "alert": null,
+    "duration_ms": 3226.5
+}
+
+[INFO]	2026-06-25T13:00:50.576Z	e2433199-cabd-4a2c-bb83-c151ad5974c3
+{
+    "mode": "paper",
+    "trade_date": "2026-06-25",
+    "action": "DO_NOTHING",
+    "reason": "Market closed (calendar gate).",
+    "status_before": "NO_POSITION",
+    "status_after": "NO_POSITION",
+    "alert": null,
+    "duration_ms": 3710.8
+}
+
+[INFO]	2026-06-25T13:15:50.001Z	cbd471d9-f6f7-4eaa-a25a-90c3577238f6
+{
+    "mode": "paper",
+    "trade_date": "2026-06-25",
+    "action": "DO_NOTHING",
+    "reason": "Market closed (calendar gate).",
+    "status_before": "NO_POSITION",
+    "status_after": "NO_POSITION",
+    "alert": null,
+    "duration_ms": 3260.1
+}
+
+[INFO]	2026-06-25T13:30:52.504Z	07a58188-b309-437b-a01d-f33e5cdd3770
+{
+    "mode": "paper",
+    "trade_date": "2026-06-25",
+    "action": "DO_NOTHING",
+    "reason": "Relative volume 0.38 below min 1.00 \u2014 no conviction.",
+    "status_before": "NO_POSITION",
+    "status_after": "NO_POSITION",
+    "alert": null,
+    "duration_ms": 5743.9
+}
+
+[INFO]	2026-06-25T13:45:50.370Z	c822ef95-bdd1-46fb-a488-2556c5a3104e
+{
+    "mode": "paper",
+    "trade_date": "2026-06-25",
+    "action": "DO_NOTHING",
+    "reason": "Mixed QQQ signals (price/vwap/ema/macd/rsi not aligned; rsi=27).",
+    "status_before": "NO_POSITION",
+    "status_after": "NO_POSITION",
+    "alert": null,
+    "duration_ms": 3541.7
+}
+
+[INFO]	2026-06-25T14:00:49.908Z	599feddb-ac4d-473b-a903-e2b132f1bf3b
+{
+    "mode": "paper",
+    "trade_date": "2026-06-25",
+    "action": "DO_NOTHING",
+    "reason": "Relative volume 0.46 below min 1.00 \u2014 no conviction.",
+    "status_before": "NO_POSITION",
+    "status_after": "NO_POSITION",
+    "alert": null,
+    "duration_ms": 3192.9
+}
+
+[INFO]	2026-06-25T14:15:50.647Z	9fa715cb-45a0-46cd-b040-54f72f737f38
+{
+    "mode": "paper",
+    "trade_date": "2026-06-25",
+    "action": "DO_NOTHING",
+    "reason": "Relative volume 0.64 below min 1.00 \u2014 no conviction.",
+    "status_before": "NO_POSITION",
+    "status_after": "NO_POSITION",
+    "alert": null,
+    "duration_ms": 3606.1
+}
+
+[INFO]	2026-06-25T14:30:50.303Z	52785105-0e3e-474c-b5cd-97c50d7a240f
+{
+    "mode": "paper",
+    "trade_date": "2026-06-25",
+    "action": "DO_NOTHING",
+    "reason": "Relative volume 0.13 below min 1.00 \u2014 no conviction.",
+    "status_before": "NO_POSITION",
+    "status_after": "NO_POSITION",
+    "alert": null,
+    "duration_ms": 3427.2
+}
+
+[INFO]	2026-06-25T14:45:50.566Z	0f749bbd-7a49-4e84-ab53-c63b8f8c5692
+{
+    "mode": "paper",
+    "trade_date": "2026-06-25",
+    "action": "DO_NOTHING",
+    "reason": "Relative volume 0.88 below min 1.00 \u2014 no conviction.",
+    "status_before": "NO_POSITION",
+    "status_after": "NO_POSITION",
+    "alert": null,
+    "duration_ms": 3717.9
+}
+
+[INFO]	2026-06-25T15:00:57.407Z	6236eece-61de-4a7b-b029-3211a2dd37c7
+{
+    "mode": "paper",
+    "trade_date": "2026-06-25",
+    "action": "DO_NOTHING",
+    "reason": "Advisory VETO: VETO (deterministic was BUY_BEARISH: BUY_BEARISH: 19 PSQ @ ~$25.84 (~$491), stop $25.79 (1.5x ATR 0.03), take $25.93.)",
+    "status_before": "NO_POSITION",
+    "status_after": "NO_POSITION",
+    "alert": null,
+    "duration_ms": 10649.3
+}
+
+[INFO]	2026-06-25T15:15:57.521Z	6750e6d2-6071-445e-8030-0637691a7e80
+{
+    "mode": "paper",
+    "trade_date": "2026-06-25",
+    "action": "DO_NOTHING",
+    "reason": "Advisory VETO: VETO (deterministic was BUY_BEARISH: BUY_BEARISH: 19 PSQ @ ~$25.93 (~$493), stop $25.88 (1.5x ATR 0.03), take $26.01.)",
+    "status_before": "NO_POSITION",
+    "status_after": "NO_POSITION",
+    "alert": null,
+    "duration_ms": 10801.4
+}
+
+[INFO]	2026-06-25T15:30:50.197Z	aeb04769-a3da-48e1-b0e7-a52efea5e1c5
+{
+    "mode": "paper",
+    "trade_date": "2026-06-25",
+    "action": "DO_NOTHING",
+    "reason": "Relative volume 0.77 below min 1.00 \u2014 no conviction.",
+    "status_before": "NO_POSITION",
+    "status_after": "NO_POSITION",
+    "alert": null,
+    "duration_ms": 3503.7
+}
+
+[INFO]	2026-06-25T15:45:49.572Z	ad46e134-2f66-4c86-af56-f0c81cb9c45c
+{
+    "mode": "paper",
+    "trade_date": "2026-06-25",
+    "action": "DO_NOTHING",
+    "reason": "Sizing yields <1 share of QQQ (notional $500 / $714.85).",
+    "status_before": "NO_POSITION",
+    "status_after": "NO_POSITION",
+    "alert": null,
+    "duration_ms": 3100.2
+}
+
+[INFO]	2026-06-25T16:00:50.385Z	9474634e-fbc3-497a-9c83-f4d9406ad6c9
+{
+    "mode": "paper",
+    "trade_date": "2026-06-25",
+    "action": "DO_NOTHING",
+    "reason": "QQQ too quiet (ATR%% below 0.100%).",
+    "status_before": "NO_POSITION",
+    "status_after": "NO_POSITION",
+    "alert": null,
+    "duration_ms": 3551.4
+}
+
+[INFO]	2026-06-25T16:15:50.489Z	4504788d-32ab-47b6-a163-de4f42d40f08
+{
+    "mode": "paper",
+    "trade_date": "2026-06-25",
+    "action": "DO_NOTHING",
+    "reason": "QQQ too quiet (ATR%% below 0.100%).",
+    "status_before": "NO_POSITION",
+    "status_after": "NO_POSITION",
+    "alert": null,
+    "duration_ms": 3580.8
+}
+
+[INFO]	2026-06-25T16:30:50.370Z	c73e9c0c-b9fc-4e61-b033-41886bb76a7c
+{
+    "mode": "paper",
+    "trade_date": "2026-06-25",
+    "action": "DO_NOTHING",
+    "reason": "Relative volume 0.20 below min 1.00 \u2014 no conviction.",
+    "status_before": "NO_POSITION",
+    "status_after": "NO_POSITION",
+    "alert": null,
+    "duration_ms": 3572.6
+}
+
+[INFO]	2026-06-25T16:45:50.497Z	0969156a-6872-4405-a5ee-72de74d063d7
+{
+    "mode": "paper",
+    "trade_date": "2026-06-25",
+    "action": "DO_NOTHING",
+    "reason": "Relative volume 0.27 below min 1.00 \u2014 no conviction.",
+    "status_before": "NO_POSITION",
+    "status_after": "NO_POSITION",
+    "alert": null,
+    "duration_ms": 3820.5
+}
+
+[INFO]	2026-06-25T17:00:50.439Z	6d4c0cca-421f-4aeb-854f-e33c0f382651
+{
+    "mode": "paper",
+    "trade_date": "2026-06-25",
+    "action": "DO_NOTHING",
+    "reason": "Relative volume 0.20 below min 1.00 \u2014 no conviction.",
+    "status_before": "NO_POSITION",
+    "status_after": "NO_POSITION",
+    "alert": null,
+    "duration_ms": 3739.5
+}
+
+[INFO]	2026-06-25T17:15:50.278Z	796cef4b-657e-468c-a251-d7c9170261a3
+{
+    "mode": "paper",
+    "trade_date": "2026-06-25",
+    "action": "DO_NOTHING",
+    "reason": "Relative volume 0.78 below min 1.00 \u2014 no conviction.",
+    "status_before": "NO_POSITION",
+    "status_after": "NO_POSITION",
+    "alert": null,
+    "duration_ms": 3448.5
+}
+
+[INFO]	2026-06-25T17:30:50.806Z	f7a03017-ee84-47e2-b42f-8ba87af2ddcf
+{
+    "mode": "paper",
+    "trade_date": "2026-06-25",
+    "action": "DO_NOTHING",
+    "reason": "Relative volume 0.10 below min 1.00 \u2014 no conviction.",
+    "status_before": "NO_POSITION",
+    "status_after": "NO_POSITION",
+    "alert": null,
+    "duration_ms": 3893.3
+}
+
+[INFO]	2026-06-25T17:45:50.087Z	1de574b8-8bc3-444a-9c2c-269bdca4dd7d
+{
+    "mode": "paper",
+    "trade_date": "2026-06-25",
+    "action": "DO_NOTHING",
+    "reason": "QQQ too quiet (ATR%% below 0.100%).",
+    "status_before": "NO_POSITION",
+    "status_after": "NO_POSITION",
+    "alert": null,
+    "duration_ms": 3354.3
+}
+
+[INFO]	2026-06-25T18:00:50.327Z	effa241c-bf0c-4db0-867f-8c9654042ea3
+{
+    "mode": "paper",
+    "trade_date": "2026-06-25",
+    "action": "DO_NOTHING",
+    "reason": "QQQ too quiet (ATR%% below 0.100%).",
+    "status_before": "NO_POSITION",
+    "status_after": "NO_POSITION",
+    "alert": null,
+    "duration_ms": 3428.9
+}
+
+[INFO]	2026-06-25T18:15:49.992Z	8ba9808b-4aa7-4443-9f47-345eaafa3393
+{
+    "mode": "paper",
+    "trade_date": "2026-06-25",
+    "action": "DO_NOTHING",
+    "reason": "Relative volume 0.33 below min 1.00 \u2014 no conviction.",
+    "status_before": "NO_POSITION",
+    "status_after": "NO_POSITION",
+    "alert": null,
+    "duration_ms": 3291.0
+}
+
+[INFO]	2026-06-25T18:30:49.992Z	8300707e-509a-45df-85f7-61281871270f
+{
+    "mode": "paper",
+    "trade_date": "2026-06-25",
+    "action": "DO_NOTHING",
+    "reason": "After entry cutoff 14:30 ET (now 14:30).",
+    "status_before": "NO_POSITION",
+    "status_after": "NO_POSITION",
+    "alert": null,
+    "duration_ms": 3245.2
+}
+
+[INFO]	2026-06-25T18:45:50.667Z	54d648d0-8007-4888-ad7d-765cc9bf5aaa
+{
+    "mode": "paper",
+    "trade_date": "2026-06-25",
+    "action": "DO_NOTHING",
+    "reason": "After entry cutoff 14:30 ET (now 14:45).",
+    "status_before": "NO_POSITION",
+    "status_after": "NO_POSITION",
+    "alert": null,
+    "duration_ms": 3781.1
+}
+
+[INFO]	2026-06-25T19:00:50.544Z	e3a4d9d0-a7ce-44b6-b981-dcef2f7a4dc9
+{
+    "mode": "paper",
+    "trade_date": "2026-06-25",
+    "action": "DO_NOTHING",
+    "reason": "After entry cutoff 14:30 ET (now 15:00).",
+    "status_before": "NO_POSITION",
+    "status_after": "NO_POSITION",
+    "alert": null,
+    "duration_ms": 3808.1
+}
+
+[INFO]	2026-06-25T19:15:49.977Z	b6acf124-12bd-4c8b-97bd-fd21f97be1eb
+{
+    "mode": "paper",
+    "trade_date": "2026-06-25",
+    "action": "DO_NOTHING",
+    "reason": "After entry cutoff 14:30 ET (now 15:15).",
+    "status_before": "NO_POSITION",
+    "status_after": "NO_POSITION",
+    "alert": null,
+    "duration_ms": 3275.7
+}
+
+[INFO]	2026-06-25T19:30:50.181Z	d075577a-e266-4c94-b993-352f6a0cc9df
+{
+    "mode": "paper",
+    "trade_date": "2026-06-25",
+    "action": "DO_NOTHING",
+    "reason": "After entry cutoff 14:30 ET (now 15:30).",
+    "status_before": "NO_POSITION",
+    "status_after": "NO_POSITION",
+    "alert": null,
+    "duration_ms": 3441.5
+}
+
+[INFO]	2026-06-25T19:45:50.230Z	47a426c3-5156-4719-b93a-1a9d2b071186
+{
+    "mode": "paper",
+    "trade_date": "2026-06-25",
+    "action": "DO_NOTHING",
+    "reason": "After entry cutoff 14:30 ET (now 15:45).",
+    "status_before": "NO_POSITION",
+    "status_after": "NO_POSITION",
+    "alert": null,
+    "duration_ms": 3464.7
+}
+
+[INFO]	2026-06-25T19:47:14.440Z	c3e3e396-8f94-4d9c-9a97-d9e72a6ee5b7
+{
+    "mode": "paper",
+    "trade_date": "2026-06-25",
+    "action": "DO_NOTHING",
+    "reason": "After entry cutoff 14:30 ET (now 15:47).",
+    "status_before": "NO_POSITION",
+    "status_after": "NO_POSITION",
+    "alert": null,
+    "duration_ms": 3617.0
+}
+
+[INFO]	2026-06-25T19:56:22.272Z	eb6fe7d3-c20e-4ab7-a817-cdda048cb154
+{
+    "mode": "paper",
+    "trade_date": "2026-06-25",
+    "action": "DO_NOTHING",
+    "reason": "After entry cutoff 14:30 ET (now 15:56).",
+    "status_before": "NO_POSITION",
+    "status_after": "NO_POSITION",
+    "alert": null,
+    "duration_ms": 3437.7
+}
+
+[INFO]	2026-06-25T20:00:49.880Z	7ee3a506-be4c-43dd-bd75-6f4613b65cef
+{
+    "mode": "paper",
+    "trade_date": "2026-06-25",
+    "action": "DO_NOTHING",
+    "reason": "Market closed (calendar gate).",
+    "status_before": "NO_POSITION",
+    "status_after": "NO_POSITION",
+    "alert": null,
+    "duration_ms": 3285.3
+}
+
+[INFO]	2026-06-25T20:15:49.945Z	cab9c5fd-11e4-4302-8190-8d39ec500188
+{
+    "mode": "paper",
+    "trade_date": "2026-06-25",
+    "action": "DO_NOTHING",
+    "reason": "Market closed (calendar gate).",
+    "status_before": "NO_POSITION",
+    "status_after": "NO_POSITION",
+    "alert": null,
+    "duration_ms": 3228.3
+}
+
+[INFO]	2026-06-25T20:30:50.003Z	40c70d9e-016e-4de2-882f-522eb6a6b172
+{
+    "mode": "paper",
+    "trade_date": "2026-06-25",
+    "action": "DO_NOTHING",
+    "reason": "Market closed (calendar gate).",
+    "status_before": "NO_POSITION",
+    "status_after": "NO_POSITION",
+    "alert": null,
+    "duration_ms": 3241.4
+}
+
+[INFO]	2026-06-25T20:45:50.032Z	0a13041f-29b1-4cdf-b076-7396f254fa3b
+{
+    "mode": "paper",
+    "trade_date": "2026-06-25",
+    "action": "DO_NOTHING",
+    "reason": "Market closed (calendar gate).",
+    "status_before": "NO_POSITION",
+    "status_after": "NO_POSITION",
+    "alert": null,
+    "duration_ms": 3281.2
+}
+
+[INFO]	2026-06-25T20:47:10.760Z	83b430bf-5d0b-4d19-89e6-510daf2ff975
+{
+    "mode": "paper",
+    "trade_date": "2026-06-25",
+    "action": "DO_NOTHING",
+    "reason": "Market closed (calendar gate).",
+    "status_before": "NO_POSITION",
+    "status_after": "NO_POSITION",
+    "alert": null,
+    "duration_ms": 542.6
+}
+
+[INFO]	2026-06-25T20:56:22.575Z	032de75d-46a5-4e6f-9ed5-03e0528ccccd
+{
+    "mode": "paper",
+    "trade_date": "2026-06-25",
+    "action": "DO_NOTHING",
+    "reason": "Market closed (calendar gate).",
+    "status_before": "NO_POSITION",
+    "status_after": "NO_POSITION",
+    "alert": null,
+    "duration_ms": 3681.4
+}
+
+[INFO]	2026-06-25T21:00:49.972Z	ab7fd432-ab52-43a6-a0ef-c9a4ff5ffcb2
+{
+    "mode": "paper",
+    "trade_date": "2026-06-25",
+    "action": "DO_NOTHING",
+    "reason": "Market closed (calendar gate).",
+    "status_before": "NO_POSITION",
+    "status_after": "NO_POSITION",
+    "alert": null,
+    "duration_ms": 3314.4
+}
+
+[INFO]	2026-06-25T21:15:50.069Z	9ebfd486-b593-4c07-a9fc-459b31d3d300
+{
+    "mode": "paper",
+    "trade_date": "2026-06-25",
+    "action": "DO_NOTHING",
+    "reason": "Market closed (calendar gate).",
+    "status_before": "NO_POSITION",
+    "status_after": "NO_POSITION",
+    "alert": null,
+    "duration_ms": 3352.3
+}
+
+[INFO]	2026-06-25T21:30:50.073Z	ac8886d0-d636-49a4-9380-410727a8c1a3
+{
+    "mode": "paper",
+    "trade_date": "2026-06-25",
+    "action": "DO_NOTHING",
+    "reason": "Market closed (calendar gate).",
+    "status_before": "NO_POSITION",
+    "status_after": "NO_POSITION",
+    "alert": null,
+    "duration_ms": 3371.9
+}
+
+[INFO]	2026-06-25T21:45:51.015Z	bf4caa4a-0bed-4c74-88e5-fd689bdac1f0
+{
+    "mode": "paper",
+    "trade_date": "2026-06-25",
+    "action": "DO_NOTHING",
+    "reason": "Market closed (calendar gate).",
+    "status_before": "NO_POSITION",
+    "status_after": "NO_POSITION",
+    "alert": null,
+    "duration_ms": 4014.2
+}
+

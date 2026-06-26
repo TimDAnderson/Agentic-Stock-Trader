@@ -15,7 +15,7 @@ from __future__ import annotations
 from datetime import time
 from typing import Any
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from trading_bot.domain.decisions import EntryAction
 
@@ -96,11 +96,36 @@ class StrategyConfig(BaseModel):
     max_position_pct: float = 0.10  # fraction of equity to deploy on one entry
     stop_loss_atr_multiple: float = 1.5
     take_profit_atr_multiple: float = 3.0
+    # Floor on the stop distance as a fraction of price. A minute-bar ATR can be
+    # tiny (e.g. ~$0.03 on a $26 ETF -> a 0.2% stop that noise trips instantly);
+    # this guarantees the stop sits at least this far from entry. The take scales
+    # with the *actual* stop distance, preserving the ATR-implied reward:risk.
+    min_stop_loss_pct: float = 0.01
 
     # --- Exit management ----------------------------------------------------
     # Strategy-level forced exit time (ET). The scheduled EOD liquidation run is
     # the plumbing backstop; this lets the strategy ask to sell earlier.
     force_exit_after: time = time(15, 55)
+
+    # --- EOD backstop: broker-side MOC (DECISIONS.md §5) --------------------
+    # A market-on-close sell placed in the afternoon flattens the position at
+    # the closing auction even if no later run fires (survives a dead Lambda).
+    # Placed when a run lands in the window [place_moc_after, moc_cutoff) ET;
+    # Alpaca's MOC submission deadline is ~15:50 ET, so moc_cutoff stays before
+    # it. Placing the MOC cancels the resting bracket legs (avoids a double-exit
+    # that could leave a short), so there is no hard stop in this short window.
+    moc_backstop_enabled: bool = True
+    place_moc_after: time = time(15, 45)
+    moc_cutoff: time = time(15, 50)
+
+    @model_validator(mode='after')
+    def _check_eod_ordering(self) -> StrategyConfig:
+        if not self.place_moc_after < self.moc_cutoff <= self.force_exit_after:
+            raise ValueError(
+                'EOD times must satisfy place_moc_after < moc_cutoff <= force_exit_after '
+                f'(got {self.place_moc_after} < {self.moc_cutoff} <= {self.force_exit_after}).'
+            )
+        return self
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> StrategyConfig:

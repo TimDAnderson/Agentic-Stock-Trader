@@ -13,6 +13,7 @@ Usage:
     uv run python examples/run_local.py                 # one run, now
     uv run python examples/run_local.py --no-advisor    # deterministic only
     uv run python examples/run_local.py --loop --interval 300   # every 5 min
+    uv run python examples/run_local.py --force-entry --cycle 1  # extra test cycle
 
 The calendar gate means a run outside market hours correctly does nothing.
 """
@@ -21,8 +22,13 @@ from __future__ import annotations
 
 import argparse
 import time
+from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
 
+from trading_bot.config_loader import describe_source
 from trading_bot.runner import build_local_engine, run_once
+
+ET = ZoneInfo('America/New_York')
 
 
 def main() -> None:
@@ -37,22 +43,58 @@ def main() -> None:
     parser.add_argument(
         '--interval', type=float, default=300.0, help='seconds between runs (--loop)'
     )
+    parser.add_argument(
+        '--cycle',
+        type=int,
+        default=0,
+        help=(
+            'DEV ONLY: run an extra buy-once/sell-once cycle on a synthetic '
+            'trade-date = today+N (unique state key + client_order_id). Bump it '
+            'each session to re-test the full path on the same real day.'
+        ),
+    )
+    parser.add_argument(
+        '--stop-pct',
+        type=float,
+        default=0.05,
+        help=(
+            'force-entry only: protective bracket width as a fraction of price '
+            '(default 0.05 = 5%%). Wide so the position survives to watch the '
+            'exit logic; lower it to test a stop/take fill.'
+        ),
+    )
+    parser.add_argument(
+        '--config',
+        default=None,
+        help=(
+            'path to a JSON/YAML StrategyConfig file (else STRATEGY_CONFIG_FILE / '
+            'STRATEGY_CONFIG_SSM env, else defaults). Point at the deployed config '
+            'to make local decisions match prod.'
+        ),
+    )
     args = parser.parse_args()
 
     if args.force_entry:
         print('WARNING: --force-entry will place a REAL order on the paper account.')
 
     engine, provider = build_local_engine(
-        use_advisor=not args.no_advisor, force_entry=args.force_entry
+        use_advisor=not args.no_advisor,
+        force_entry=args.force_entry,
+        force_entry_stop_pct=args.stop_pct,
+        config_file=args.config,
     )
     advisor_state = 'on' if engine.advisor else 'off'
     mode = 'FORCE-ENTRY' if args.force_entry else 'normal'
+    source = describe_source(file=args.config)
+    trade_date = datetime.now(ET).date() + timedelta(days=args.cycle) if args.cycle else None
     print(
-        f'Connected: {engine.broker.mode.value} account, advisor={advisor_state}, strategy={mode}'
+        f'Connected: {engine.broker.mode.value} account, advisor={advisor_state}, '
+        f'strategy={mode}, config={source}'
+        + (f', trade_date={trade_date} (cycle {args.cycle})' if trade_date else '')
     )
 
     def _one() -> None:
-        record = run_once(engine, provider)
+        record = run_once(engine, provider, trade_date=trade_date)
         line = f'[{record.ts.isoformat()}] {record.action}: {record.reason}'
         if record.alert:
             line += f'  ALERT: {record.alert}'

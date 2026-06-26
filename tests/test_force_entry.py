@@ -24,15 +24,23 @@ def test_force_entry_always_buys_and_sizes() -> None:
     d = ForceEntryStrategy().evaluate_entry(s, StrategyConfig())
     assert d.action is EntryAction.BUY_BULLISH
     assert d.qty == 25  # floor(10% of 100k / $400)
-    assert d.stop_loss_price is not None and d.stop_loss_price < 400.0
+    # Wide fixed-% bracket (default 5%), not the tight ATR stop.
+    assert d.stop_loss_price == 380.0  # 400 * (1 - 0.05)
+    assert d.take_profit_price == 420.0  # 400 * (1 + 0.05)
 
 
-def test_force_entry_works_without_atr() -> None:
-    # Early-session: no ATR yet — still buys, using a fallback percentage stop.
-    s = _state({'QQQ': Indicators(symbol='QQQ', price=400.0)})
+def test_force_entry_stop_ignores_tiny_atr() -> None:
+    # A tiny minute-bar ATR must NOT produce a near-entry stop that fills instantly.
+    s = _state({'QQQ': Indicators(symbol='QQQ', price=400.0, atr=0.3)})
     d = ForceEntryStrategy().evaluate_entry(s, StrategyConfig())
-    assert d.action is EntryAction.BUY_BULLISH
-    assert d.stop_loss_price == 394.0  # 400 * (1 - 0.01) via fallback ATR
+    assert d.stop_loss_price == 380.0  # still the wide 5% stop, unaffected by ATR
+
+
+def test_force_entry_stop_pct_is_configurable() -> None:
+    s = _state({'QQQ': Indicators(symbol='QQQ', price=400.0)})
+    d = ForceEntryStrategy(stop_pct=0.005, take_pct=0.02).evaluate_entry(s, StrategyConfig())
+    assert d.stop_loss_price == 398.0  # 400 * (1 - 0.005)
+    assert d.take_profit_price == 408.0  # 400 * (1 + 0.02)
 
 
 def test_force_entry_respects_target_dollars_and_min_one_share() -> None:

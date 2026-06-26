@@ -46,9 +46,18 @@ no-API-key** core:
   `examples/run_local.py` CLI to run the whole flow against Alpaca paper +
   OpenRouter on your laptop. The full pipeline is tested end-to-end with fakes.
 
+- ✅ **7. CDK deployment** — a parameterized `TradingBotStack` (paper = staging,
+  live = prod) provisioning the DynamoDB table (schema matches the repo), an SSM
+  `StrategyConfig` parameter, IAM grants to read the **SSM SecureString** secrets
+  you create out-of-band, a container-image Lambda running
+  `trading_bot.aws.handler.handler`, EventBridge schedules (weekday/session
+  cadence + a guaranteed near-close liquidation fire, both made correct by the
+  in-handler calendar gate), and CloudWatch alarms → SNS. See
+  **[Deploy to AWS](#deploy-to-aws-phase-7)**.
+
 Not built yet (each layers on top without touching the above):
 
-- ☐ 7. CDK deployment — paper + live stacks, EventBridge, Secrets Manager, alarms.
+- ☐ 8. Promote — sustained paper runs → live at minimum share size.
 - ☐ Data tools — real news / economic-calendar / VIX providers (today
   `AlpacaMarketDataProvider` does bars→indicators; the rest return empty).
 
@@ -106,6 +115,8 @@ tests or the synthetic backtest; they're only for runs that hit real services.
 | `ALPACA_LIVE_API_KEY` / `ALPACA_LIVE_SECRET_KEY` | live trading | live mode only (phase 7+) — **not** needed locally |
 | `OPENROUTER_API_KEY` | OpenRouter advisory LLM | any run **with** the advisor (omit + use `--no-advisor` to skip) |
 | `OPENROUTER_MODEL` | OpenRouter advisory LLM | optional; default `openai/gpt-4o-mini` |
+| `STRATEGY_CONFIG_FILE` | `StrategyConfig` loader | optional; path to a JSON/YAML config file (else defaults) |
+| `STRATEGY_CONFIG_SSM` | `StrategyConfig` loader | optional; SSM parameter name holding a JSON config (needs `aws` extra) |
 | `DYNAMODB_TABLE` | runner state persistence | set to use DynamoDB instead of in-memory state |
 | `DYNAMODB_ENDPOINT` | DynamoDB client | set to DynamoDB Local (e.g. `http://localhost:8000`); table auto-created |
 | `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` | boto3 | required by boto3 even for DynamoDB Local — use dummy `local` / `local` |
@@ -116,6 +127,22 @@ the bot refuses to start if the keys don't match the intended endpoint.
 `StrategyConfig` loads from a dict (local JSON/YAML, SSM JSON, or a DynamoDB item),
 so tuning is a zero-deploy change; every config and strategy is versioned and
 stamped on each trade record.
+
+The **same resolver** (`load_strategy_config`) feeds both local and deployed runs,
+so the only thing that makes a local decision differ from prod is the config it
+reads. Point local at the config you deploy for decision-parity:
+
+```bash
+# local: a JSON/YAML file (a starter lives at examples/strategy_config.example.json)
+uv run python examples/run_local.py --config examples/strategy_config.example.json
+export STRATEGY_CONFIG_FILE=examples/strategy_config.example.json   # or via env
+
+# deployed: the same shape, stored in SSM (read by the Lambda)
+export STRATEGY_CONFIG_SSM=/trading-bot/strategy-config
+```
+
+Precedence: explicit `--config` → `STRATEGY_CONFIG_FILE` → `STRATEGY_CONFIG_SSM` →
+built-in defaults. The run banner prints which source was used (`config=...`).
 
 ## Run locally against paper (market open)
 
@@ -184,3 +211,159 @@ or the EOD liquidation flattens it.
 > ⚠️ `--force-entry` places a **real order on your paper account** and bypasses
 > all conviction gates. It is for pre-deploy validation only — never use it for a
 > deployed or live run.
+
+## Deploy to AWS (phase 7)
+
+The **paper stack is your staging environment** (§10): same handler the live
+stack runs, real plumbing/timing, fake money. The Lambda runs the *same*
+`build_engine` wiring as the local runner — only the secret/config *source*
+differs (§11).
+
+**Prerequisites**
+
+```bash
+npm install -g aws-cdk          # the CDK CLI (Toolkit)
+uv sync --extra infra           # aws-cdk-lib for the Python app
+aws configure                   # credentials for the target (staging) account
+cdk bootstrap                   # once per account/region
+```
+
+**Deploy the staging (paper) stack**
+
+```bash
+make deploy-paper               # = cd infra && cdk deploy TradingBotPaper
+```
+
+This builds the container image, creates the DynamoDB table, the SSM config
+parameter (from `examples/strategy_config.example.json` — or point
+`STRATEGY_CONFIG_FILE` at your tuned file), the EventBridge schedules, and alarms.
+It does **not** create the secrets (see below). The stack prints a
+`SecretSsmParams` output listing the SecureString parameter names the Lambda
+reads.
+
+### Secrets: SSM SecureStrings you create yourself
+
+Secrets are **SSM Parameter Store `SecureString` parameters** — you create and
+rotate them out-of-band (never in code/CloudFormation). CDK only grants the
+Lambda permission to **read + KMS-decrypt** them. Create these three under
+`/trading-bot/paper/` (the live stack uses `ALPACA_LIVE_*` under
+`/trading-bot/live/`):
+
+```bash
+aws ssm put-parameter --type SecureString --name /trading-bot/paper/ALPACA_PAPER_API_KEY    --value 'PK...'
+aws ssm put-parameter --type SecureString --name /trading-bot/paper/ALPACA_PAPER_SECRET_KEY --value '...'
+aws ssm put-parameter --type SecureString --name /trading-bot/paper/OPENROUTER_API_KEY      --value 'sk-or-...'
+```
+
+The **parameter's last path segment is the env-var name the code reads**
+(`/trading-bot/paper/ALPACA_PAPER_API_KEY` → `ALPACA_PAPER_API_KEY`). The handler
+loads them into the environment at cold start, so `load_credentials` /
+`OpenRouterLLM` find their keys exactly as they do locally. Until they exist the
+run fails loudly (safe) rather than trading blind. Rotating = another
+`put-parameter --overwrite`; **no redeploy** (applies on the next cold start).
+
+> Using the default `aws/ssm` KMS key needs no extra setup — the stack grants
+> `kms:Decrypt` scoped to the SSM service. A **customer-managed** KMS key would
+> also need that key's policy to allow the Lambda role.
+
+The non-secret **`StrategyConfig` is created by CDK** (plain SSM `String`) and is
+a zero-deploy tuning lever — edit the parameter to retune; the handler reads it
+each run.
+
+**Verify it's running:** invoke once by hand, then watch the logs / DynamoDB.
+
+```bash
+aws lambda invoke --function-name <FunctionName-from-outputs> /dev/stdout
+```
+
+A `DO_NOTHING` result (or "Market closed (calendar gate)" off-hours) is the
+normal, correct outcome — the schedule fires often; the gate + strategy keep most
+runs idle.
+
+> The live stack is a second instantiation (`make deploy-live`, separate account
+> recommended). Don't promote until paper has run cleanly for a sustained period
+> (§10), and go live at **minimum share size** (§14).
+
+### EOD safety: two independent backstops
+
+Flat-by-close is enforced two ways, so a single failure can't strand a position:
+
+1. **Resting MOC (market-on-close)** — at ~15:47 ET (the `MocBackstop` rule) the
+   engine cancels the bracket legs and places a **market-on-close sell** that the
+   exchange fills in the closing auction **even if no later Lambda runs**. This is
+   the "survives a dead Lambda" guarantee. Window/toggle: `place_moc_after`,
+   `moc_cutoff`, `moc_backstop_enabled` in `StrategyConfig`.
+2. **Scheduled liquidation** — at ~15:56 ET (the `EodLiquidation` rule) the
+   strategy's `force_exit_after` triggers `close_all_positions`, an immediate
+   market exit that also cancels the resting MOC. If runs keep firing this is what
+   flattens you; the MOC is the insurance for when they don't.
+
+Trade-off (by design): between the MOC placement (~15:47) and the close there is
+no hard stop — the bracket was cancelled so the MOC can't be left selling shares a
+stop already closed (which would open a short). It's a ~10-minute window on a
+buy-once/flat-by-close bot.
+
+To **watch it on paper:** force an entry mid-session and leave the loop running
+into the afternoon, or invoke the deployed Lambda after 15:45 ET — a run logs
+`action: MOC` once, then the position flattens at the close.
+
+## Inspecting runs & decisions
+
+There are **two** record stores (DECISIONS.md §9), and a script for each. Both
+need the `aws` extra and read-only AWS credentials:
+
+```bash
+uv sync --extra aws
+```
+
+### Run summaries (CloudWatch Logs) — *did it run, what did it decide?*
+
+Every invocation logs a one-line JSON summary (`action`, `reason`,
+`status_before/after`, `duration_ms`). `examples/export_runs.py` pulls those from
+the Lambda's CloudWatch log group over a rolling window and writes a readable file
+with a one-line-per-run table plus the full entries:
+
+```bash
+uv run --extra aws python examples/export_runs.py                 # last 2 days
+uv run --extra aws python examples/export_runs.py --days 7 --out runs.txt
+```
+
+Flags: `--days` (look-back window), `--out` (output file), `--log-group`,
+`--region`. A normal day is mostly `DO_NOTHING` (calendar-gated off-hours, or no
+conviction) — that's correct, not a failure.
+
+### Advisory reasoning (DynamoDB) — *why did the LLM veto?*
+
+The CloudWatch summary doesn't include the LLM's reasoning — the **full
+Tree-of-Thought blob** (bull/bear/neutral theses, the evaluator's verdict, and
+`llm_calls`) is persisted to the **DynamoDB run records**. `examples/export_advisories.py`
+reads them and prints, for each run that invoked the advisor, the recommendation,
+the branch arguments, and — crucially — `llm_calls`:
+
+```bash
+uv run --extra aws python examples/export_advisories.py --days 3 --out vetoes.txt
+```
+
+Flags: `--days`, `--table`, `--region`, `--out`. The **`llm_calls`** field tells
+you which kind of veto it is:
+
+- **`llm_calls > 0`** (≈4: bull/bear/neutral + evaluator) → genuine reasoning;
+  read the branch theses to see *why*.
+- **`llm_calls == 0`** → the advisor **errored and safe-defaulted to VETO** (bad
+  model slug, missing/blocked `OPENROUTER_API_KEY`, timeout). The `reason` reads
+  `Advisory failed (...)`. This is a config problem masquerading as caution — it
+  would silently veto every buy.
+
+> Both scripts default to **this deployment's** auto-generated log-group / table
+> names. If you redeploy into a fresh stack they change — find the current ones
+> with `aws cloudformation describe-stacks --stack-name TradingBotPaper` (the
+> `TableName` output and the Lambda's log group) and pass `--table` / `--log-group`.
+
+### Underlying data (raw)
+
+- **CloudWatch Logs** — operational logs (errors, timings, the run summaries).
+  Query ad-hoc in the console with Logs Insights.
+- **DynamoDB** — the durable system-of-record, single table keyed
+  `PK=DATE#<date>` with `SK` of `STATE` (the daily gate), `RUN#<ts>` (one per run,
+  with the advisory blob), and `TRADE#<order_id>` (one per actual order). A GSI
+  (`GSI1`) indexes trades by `strategy_version` for cross-day analysis.

@@ -84,7 +84,18 @@ def test_bearish_buys_psq_sized_on_psq_price() -> None:
     d = MomentumStrategy().evaluate_entry(s, StrategyConfig())
     assert d.action is EntryAction.BUY_BEARISH
     assert d.qty == 833  # floor(10000 / 12)
-    assert d.stop_loss_price == 11.78  # 12 - 1.5 * 0.15
+    assert d.stop_loss_price == 11.78  # 12 - 1.5 * 0.15 (ATR stop wins over the floor)
+
+
+def test_stop_floored_when_minute_atr_is_tiny() -> None:
+    # The live PSQ veto case: ATR ~$0.04 would give a 0.06 (0.23%) stop that noise
+    # trips instantly. The 1% floor widens it; the take keeps the 2:1 reward:risk.
+    s = state({'QQQ': bearish_qqq(), 'PSQ': psq(price=25.85, atr=0.04)})
+    d = MomentumStrategy().evaluate_entry(s, StrategyConfig())
+    assert d.action is EntryAction.BUY_BEARISH
+    assert d.stop_loss_price == 25.59  # 25.85 - 1% (0.2585), not 25.85 - 0.06
+    assert d.take_profit_price == 26.37  # 25.85 + 0.2585 * (3.0/1.5)
+    assert 'floor' in d.reason
 
 
 def test_target_dollar_sizing_overrides_pct() -> None:

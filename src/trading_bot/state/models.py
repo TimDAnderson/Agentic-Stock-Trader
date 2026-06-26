@@ -46,6 +46,7 @@ class DailyState(BaseModel):
     qty: int | None = None
     entry_order_id: str | None = None
     exit_order_id: str | None = None
+    moc_order_id: str | None = None  # the EOD market-on-close backstop, once placed
     created_at: datetime
     updated_at: datetime
     revision: int = 0  # bumped on every transition (optimistic-lock breadcrumb)

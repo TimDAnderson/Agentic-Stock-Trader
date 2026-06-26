@@ -1,0 +1,22 @@
+Advisory reasoning — last 2 day(s)
+Table: TradingBotPaper-StateTable9728C7E5-1NK7RZ8BH7KLM
+========================================================================================
+
+2026-06-25T15:00:57.385576+00:00  action=DO_NOTHING
+  recommendation : VETO
+  llm_calls      : 4
+  run reason     : Advisory VETO: VETO (deterministic was BUY_BEARISH: BUY_BEARISH: 19 PSQ @ ~$25.84 (~$491), stop $25.79 (1.5x ATR 0.03), take $25.93.)
+  evaluator      : VETO
+  BULL    : This BUY_BEARISH trade on PSQ (inverse QQQ ETF) looks promising because QQQ is showing bearish momentum with RSI below 46 and negative MACD histogram, while trading below its VWAP at 713.66. PSQ is positioned above its VWAP at 25.75 with neutral RSI around 50, suggesting it could benefit from continued QQQ weakness. The tight stop at $25.79 (only 5 cents risk) provides excellent risk management for a potential move toward the $25.93 target.
+  BEAR    : **BEAR CASE:** PSQ is trading above its VWAP ($25.84 vs $25.747), indicating underlying strength that could continue pushing price higher against your bearish position. The extremely tight stop loss at $25.79 (only $0.05 or 0.19% away) provides minimal room for normal market noise, making this trade vulnerable to quick stop-out even on minor upward price movements.
+  NEUTRAL : The trade shows mixed technical signals - PSQ is trading above VWAP ($25.84 vs $25.747) with neutral RSI (50.54), but MACD histogram is slightly negative (-0.0025), suggesting weak bearish momentum. The stop loss at $25.79 provides only 5 cents (0.19%) downside protection with a tight 9-cent target range, while the underlying QQQ shows more pronounced bearish divergence with RSI below 46 and stronger negative MACD histogram (-0.20). Risk-reward appears unfavorable given the minimal stop buffer relative to the modest profit target in a mixed technical environment.
+
+2026-06-25T15:15:57.496550+00:00  action=DO_NOTHING
+  recommendation : VETO
+  llm_calls      : 4
+  run reason     : Advisory VETO: VETO (deterministic was BUY_BEARISH: BUY_BEARISH: 19 PSQ @ ~$25.93 (~$493), stop $25.88 (1.5x ATR 0.03), take $26.01.)
+  evaluator      : VETO
+  BULL    : This BUY_BEARISH trade on PSQ (inverse QQQ ETF) is well-positioned given QQQ's weak technicals showing RSI at 33.65 (oversold territory) and negative MACD histogram of -0.42, suggesting continued downward momentum in the underlying index. PSQ is trading above its VWAP at $25.925 vs $25.78, indicating current strength in the inverse ETF, while the tight stop at $25.88 (only 5 cents risk) provides excellent risk management with a favorable risk-reward ratio targeting $26.01.
+  BEAR    : The extremely low relative volume (0.054) for PSQ suggests minimal market participation and poor liquidity, making it difficult to execute the trade at desired prices or exit quickly if needed. Additionally, the tight stop loss at $25.88 (only $0.05 below entry) provides minimal room for normal price fluctuations, creating high risk of premature stop-out even if the overall bearish thesis proves correct.
+  NEUTRAL : The bearish position on PSQ appears technically sound given QQQ's weak momentum (RSI 33.6, negative MACD histogram -0.42) and trading below VWAP at 710.94 vs 713.64, while PSQ shows relative strength at 25.925 vs VWAP 25.78. However, the extremely low relative volume (0.054) in PSQ raises liquidity concerns, and the tight stop loss at $25.88 (only $0.045 below entry) may trigger prematurely given the ATR of 0.029. The risk-reward setup favors the trade directionally, but execution may be challenging due to low volume conditions.
+

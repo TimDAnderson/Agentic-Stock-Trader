@@ -56,6 +56,13 @@ def _state() -> MarketState:
     return MarketState(as_of=AS_OF, indicators={'QQQ': qqq}, equity=100_000.0)
 
 
+def _state_at(hour: int, minute: int) -> MarketState:
+    """A MarketState on the same trade date but at a specific ET time-of-day."""
+    qqq = Indicators(symbol='QQQ', price=400.0, rsi=60.0, macd_hist=0.2, vwap=399.0)
+    as_of = datetime(2026, 6, 2, hour, minute, tzinfo=ET)
+    return MarketState(as_of=as_of, indicators={'QQQ': qqq}, equity=100_000.0)
+
+
 def _buy() -> EntryDecision:
     return EntryDecision(
         action=EntryAction.BUY_BULLISH,
@@ -183,6 +190,77 @@ def test_advisor_proceed_allows_a_buy() -> None:
     assert run.action == EntryAction.BUY_BULLISH.value
     assert run.status_after is PositionStatus.POSITION_OPEN
     assert run.advisory is not None and run.advisory['recommendation'] == 'PROCEED'
+
+
+# -- EOD market-on-close backstop (DECISIONS.md §5) -------------------------
+
+
+def test_moc_backstop_rests_in_window_and_survives_no_run() -> None:
+    broker = FakeBroker(BrokerMode.PAPER, prices={'QQQ': 400.0})
+    engine = _engine(_buy(), ExitDecision.hold('hold'), broker)
+    engine.run(_state())  # entry at 10:00 ET
+    run2 = engine.run(_state_at(15, 46))  # in the [15:45, 15:50) MOC window
+
+    assert run2.action == 'MOC'
+    assert run2.status_after is PositionStatus.POSITION_OPEN
+    daily = engine.repository.get_daily_state(run2.trade_date)
+    assert daily is not None and daily.moc_order_id == '2026-06-02-MOC'
+    # The MOC rests — the position is still open until the close.
+    assert broker.get_position('QQQ') is not None
+    trades = engine.repository.list_trades(run2.trade_date)
+    assert sorted(t.kind for t in trades) == ['entry', 'moc']
+
+    # The key property: the close flattens it with NO further engine run.
+    broker.settle_market_on_close()
+    assert broker.get_positions() == []
+
+
+def test_moc_backstop_placed_only_once() -> None:
+    broker = FakeBroker(BrokerMode.PAPER, prices={'QQQ': 400.0})
+    engine = _engine(_buy(), ExitDecision.hold('hold'), broker)
+    engine.run(_state())
+    engine.run(_state_at(15, 46))  # places the MOC
+    run3 = engine.run(_state_at(15, 47))  # still in window, already placed
+
+    assert run3.action == 'HOLD'
+    trades = engine.repository.list_trades(run3.trade_date)
+    assert [t.kind for t in trades].count('moc') == 1
+
+
+def test_no_moc_before_window() -> None:
+    broker = FakeBroker(BrokerMode.PAPER, prices={'QQQ': 400.0})
+    engine = _engine(_buy(), ExitDecision.hold('hold'), broker)
+    engine.run(_state())
+    run2 = engine.run(_state_at(15, 30))  # before place_moc_after
+    assert run2.action == 'HOLD'
+    daily = engine.repository.get_daily_state(run2.trade_date)
+    assert daily is not None and daily.moc_order_id is None
+
+
+def test_no_moc_after_cutoff() -> None:
+    broker = FakeBroker(BrokerMode.PAPER, prices={'QQQ': 400.0})
+    engine = _engine(_buy(), ExitDecision.hold('hold'), broker)
+    engine.run(_state())
+    run2 = engine.run(_state_at(15, 52))  # past moc_cutoff (Alpaca deadline)
+    assert run2.action == 'HOLD'
+    daily = engine.repository.get_daily_state(run2.trade_date)
+    assert daily is not None and daily.moc_order_id is None
+
+
+def test_moc_backstop_can_be_disabled() -> None:
+    broker = FakeBroker(BrokerMode.PAPER, prices={'QQQ': 400.0})
+    engine = TradingEngine(
+        broker=broker,
+        repository=InMemoryStateRepository(),
+        strategy=StubStrategy(_buy(), ExitDecision.hold('hold')),
+        config=StrategyConfig(moc_backstop_enabled=False),
+        clock=FakeClock(),
+    )
+    engine.run(_state())
+    run2 = engine.run(_state_at(15, 46))
+    assert run2.action == 'HOLD'
+    daily = engine.repository.get_daily_state(run2.trade_date)
+    assert daily is not None and daily.moc_order_id is None
 
 
 def test_market_closed_gate_does_nothing() -> None:

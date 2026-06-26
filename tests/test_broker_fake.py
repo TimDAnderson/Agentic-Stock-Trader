@@ -97,7 +97,7 @@ def test_close_all_positions_liquidates() -> None:
     assert b.get_positions() == []
 
 
-def test_moc_sell_flattens_the_position() -> None:
+def test_moc_sell_rests_until_close() -> None:
     b = _broker()
     b.submit_bracket_buy(
         BracketOrder(
@@ -106,7 +106,27 @@ def test_moc_sell_flattens_the_position() -> None:
     )
     result = b.submit_moc_sell('QQQ', 10, moc_id(date(2026, 6, 2)))
     assert result.side is OrderSide.SELL
+    assert result.status is OrderStatus.NEW
+    # The MOC rests — the position is NOT flattened until the closing auction.
+    assert b.get_position('QQQ') is not None
+
+    filled = b.settle_market_on_close()
+    assert len(filled) == 1
+    assert filled[0].status is OrderStatus.FILLED
+    assert b.get_position('QQQ') is None  # the close flattened it, no further action
+
+
+def test_close_all_supersedes_a_resting_moc() -> None:
+    b = _broker()
+    b.submit_bracket_buy(
+        BracketOrder(
+            symbol='QQQ', qty=10, stop_loss_price=395.0, client_order_id=entry_id(date(2026, 6, 2))
+        )
+    )
+    b.submit_moc_sell('QQQ', 10, moc_id(date(2026, 6, 2)))
+    b.close_all_positions(cancel_orders=True)  # immediate liquidation cancels the MOC
     assert b.get_position('QQQ') is None
+    assert b.settle_market_on_close() == []  # nothing left resting to fill
 
 
 def test_fake_broker_satisfies_broker_protocol() -> None:

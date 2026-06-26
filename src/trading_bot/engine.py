@@ -15,12 +15,12 @@ Alpaca + DynamoDB stack.
 from __future__ import annotations
 
 from collections.abc import Callable
-from datetime import UTC, date, datetime
+from datetime import UTC, date, datetime, time
 from zoneinfo import ZoneInfo
 
 from trading_bot.broker.base import BracketOrder, Broker, BrokerPosition, OrderResult
 from trading_bot.broker.errors import DuplicateClientOrderIdError
-from trading_bot.broker.ids import entry_id, exit_id
+from trading_bot.broker.ids import entry_id, exit_id, moc_id
 from trading_bot.domain.config import StrategyConfig
 from trading_bot.domain.decisions import EntryDecision, ExitAction
 from trading_bot.domain.market_state import MarketState, Position
@@ -40,6 +40,12 @@ def _trade_date(as_of: datetime) -> date:
     """The ET calendar date that owns this run (state is keyed by it)."""
     dt = as_of.astimezone(ET) if as_of.tzinfo is not None else as_of
     return dt.date()
+
+
+def _et_time(as_of: datetime) -> time:
+    """Time-of-day in ET (naive ``as_of`` is assumed already ET)."""
+    dt = as_of.astimezone(ET) if as_of.tzinfo is not None else as_of
+    return dt.timetz().replace(tzinfo=None)
 
 
 class TradingEngine:
@@ -212,6 +218,12 @@ class TradingEngine:
         )
         decision = self.strategy.evaluate_exit(state, held, self.config)
         if decision.action is ExitAction.HOLD:
+            # Before holding, consider the EOD market-on-close backstop (§5): if
+            # we're in the afternoon window and haven't placed it yet, rest a MOC
+            # sell so the close flattens us even if no later run fires.
+            moc_record = self._maybe_place_moc(daily, state, td, position)
+            if moc_record is not None:
+                return moc_record
             return self._record(
                 td,
                 status_before=PositionStatus.POSITION_OPEN,
@@ -252,6 +264,79 @@ class TradingEngine:
             action=decision.action.value,
             reason=decision.reason,
             state=state,
+        )
+
+    # -- EOD market-on-close backstop (§5) ----------------------------------
+    def _maybe_place_moc(
+        self, daily: DailyState, state: MarketState, td: date, position: BrokerPosition
+    ) -> RunRecord | None:
+        """Rest a MOC sell once, in the afternoon window. Returns a run record if
+        it acted, else ``None`` (the caller then records a normal HOLD).
+
+        Stays ``POSITION_OPEN`` — the MOC fills at the close; a later run (or the
+        next day) reconciles to ``POSITION_CLOSED`` when the broker shows flat.
+        """
+        cfg = self.config
+        if not cfg.moc_backstop_enabled or daily.moc_order_id is not None:
+            return None
+        now = _et_time(state.as_of)
+        if not (cfg.place_moc_after <= now < cfg.moc_cutoff):
+            return None
+
+        coid = moc_id(td)
+        # Drop the resting bracket legs first: a stop that fills after the MOC is
+        # placed would leave the MOC selling shares we no longer hold (a short).
+        self.broker.cancel_all_orders()
+        try:
+            fill: OrderResult | None = self.broker.submit_moc_sell(
+                position.symbol, position.qty, coid
+            )
+        except DuplicateClientOrderIdError:
+            fill = self.broker.get_order_by_client_id(coid)
+
+        updated = daily.transitioned(PositionStatus.POSITION_OPEN, self._clock(), moc_order_id=coid)
+        try:
+            self.repository.transition_status(PositionStatus.POSITION_OPEN, updated)
+        except ConcurrentTransitionError:
+            return self._record(
+                td,
+                status_before=PositionStatus.POSITION_OPEN,
+                status_after=PositionStatus.POSITION_OPEN,
+                action=ExitAction.HOLD.value,
+                reason='MOC backstop already placed by a concurrent run.',
+                state=state,
+            )
+
+        if fill is not None:
+            self.repository.append_trade(self._moc_trade(td, fill))
+        return self._record(
+            td,
+            status_before=PositionStatus.POSITION_OPEN,
+            status_after=PositionStatus.POSITION_OPEN,
+            action='MOC',
+            reason=(
+                f'EOD backstop: resting MOC sell for {position.qty} {position.symbol} '
+                f'(fills at the close); bracket legs cancelled.'
+            ),
+            state=state,
+            alert=None if fill is not None else 'MOC submitted but no result returned.',
+        )
+
+    def _moc_trade(self, td: date, fill: OrderResult) -> TradeRecord:
+        return TradeRecord(
+            trade_date=td,
+            order_id=fill.client_order_id,
+            broker_order_id=fill.id,
+            kind='moc',
+            symbol=fill.symbol,
+            side=fill.side,
+            qty=fill.qty,
+            status=fill.status,
+            filled_qty=fill.filled_qty,
+            filled_avg_price=fill.filled_avg_price,
+            strategy_version=self.strategy.version,
+            mode=self.broker.mode,
+            submitted_at=fill.submitted_at,
         )
 
     # -- helpers ------------------------------------------------------------

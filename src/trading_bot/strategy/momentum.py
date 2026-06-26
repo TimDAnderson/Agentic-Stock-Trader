@@ -152,11 +152,29 @@ class MomentumStrategy:
                 f'(notional ${notional:,.0f} / ${traded.price:.2f}).'
             )
 
-        stop = round(traded.price - traded.atr * config.stop_loss_atr_multiple, 2)
-        take = round(traded.price + traded.atr * config.take_profit_atr_multiple, 2)
+        # Stop distance = the ATR-based stop, floored at a minimum % of price so a
+        # tiny minute-bar ATR can't yield a sub-1% stop that noise trips instantly.
+        # The take scales with the *actual* stop distance to keep the reward:risk
+        # implied by the ATR multiples even when the floor is binding.
+        rr_ratio = (
+            config.take_profit_atr_multiple / config.stop_loss_atr_multiple
+            if config.stop_loss_atr_multiple > 0
+            else 2.0
+        )
+        atr_stop_distance = traded.atr * config.stop_loss_atr_multiple
+        min_stop_distance = traded.price * config.min_stop_loss_pct
+        stop_distance = max(atr_stop_distance, min_stop_distance)
+        stop = round(traded.price - stop_distance, 2)
+        take = round(traded.price + stop_distance * rr_ratio, 2)
         if stop <= 0:
             return EntryDecision.do_nothing(f'Computed stop {stop} for {symbol} is non-positive.')
 
+        floored = min_stop_distance > atr_stop_distance
+        basis = (
+            f'{config.min_stop_loss_pct:.1%} floor'
+            if floored
+            else f'{config.stop_loss_atr_multiple}x ATR {traded.atr:.2f}'
+        )
         return EntryDecision(
             action=action,
             qty=qty,
@@ -165,7 +183,7 @@ class MomentumStrategy:
             reason=(
                 f'{action.value}: {qty} {symbol} @ ~${traded.price:.2f} '
                 f'(~${qty * traded.price:,.0f}), '
-                f'stop ${stop:.2f} ({config.stop_loss_atr_multiple}x ATR {traded.atr:.2f}), '
+                f'stop ${stop:.2f} (-{stop_distance / traded.price:.2%}, {basis}), '
                 f'take ${take:.2f}.'
             ),
         )

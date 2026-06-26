@@ -3,7 +3,7 @@
 
 .DEFAULT_GOAL := help
 .PHONY: help install sync test lint typecheck format fmt check demo clean \
-	dynamo-up dynamo-down test-int
+	dynamo-up dynamo-down test-int synth diff deploy-paper deploy-live
 
 help: ## Show this help
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
@@ -16,8 +16,8 @@ test: ## Run the test suite
 	uv run pytest
 
 lint: ## Lint + verify formatting (no changes written) — what CI should run
-	uv run ruff check src tests examples
-	uv run ruff format --check src tests examples
+	uv run ruff check src tests examples infra
+	uv run ruff format --check src tests examples infra
 
 typecheck: ## Static type check with mypy (strict)
 	uv run mypy
@@ -40,6 +40,19 @@ dynamo-down: ## Stop local infra
 test-int: ## Run integration tests against DynamoDB Local (needs dynamo-up)
 	DYNAMODB_ENDPOINT=http://localhost:8000 uv run --extra aws pytest tests/test_state_dynamodb.py -v
 
+# --- CDK (phase 7) — needs the `cdk` CLI (npm i -g aws-cdk) + the infra extra ---
+synth: ## Synthesize CloudFormation for both stacks (no AWS calls)
+	cd infra && uv run --extra infra cdk synth
+
+diff: ## Show the diff vs the deployed paper stack
+	cd infra && uv run --extra infra cdk diff TradingBotPaper
+
+deploy-paper: ## Deploy the paper (staging) stack
+	cd infra && uv run --extra infra cdk deploy TradingBotPaper
+
+deploy-live: ## Deploy the live stack (requires -c live=1)
+	cd infra && uv run --extra infra cdk deploy TradingBotLive -c live=1
+
 clean: ## Remove caches and build artifacts
-	rm -rf .pytest_cache .ruff_cache .coverage htmlcov dist build
+	rm -rf .pytest_cache .ruff_cache .coverage htmlcov dist build infra/cdk.out
 	find . -type d -name __pycache__ -not -path './.venv/*' -exec rm -rf {} +

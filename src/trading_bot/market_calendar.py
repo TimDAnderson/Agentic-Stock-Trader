@@ -100,9 +100,11 @@ class AlpacaMarketCalendar:
         days = self._client.get_calendar(GetCalendarRequest(start=day, end=day))
         for entry in days or []:
             if entry.date == day:
+                # alpaca-py returns ``open``/``close`` as *naive* datetimes already
+                # combining the day with the ET wall-clock time; just localize them.
                 return MarketSession(
                     date=entry.date,
-                    open=datetime.combine(entry.date, entry.open, ET),
-                    close=datetime.combine(entry.date, entry.close, ET),
+                    open=entry.open.replace(tzinfo=ET),
+                    close=entry.close.replace(tzinfo=ET),
                 )
         return None

@@ -176,7 +176,7 @@ Environments: **local** (dev/unit/backtest) → **local end-to-end** (Alpaca pap
 4. **Persistence** — DynamoDB state machine (conditional writes), append-only decision/trade records, broker reconciliation. Test against DynamoDB Local.
 5. **LangGraph layer** — parallel gathering + ToT advisory (veto-only), with timeouts/step caps. Measure run time + LLM calls.
 6. **Market-calendar gate + local end-to-end runner** — a calendar-aware "is the market open now?" gate shared by every entrypoint, plus a laptop CLI that runs the whole flow against **Alpaca paper + OpenRouter + local state** (one-shot and on a loop). **Validate the full flow locally before any deploy** — this is the go/no-go for AWS.
-7. **CDK deployment** — parameterized stack, paper + live (separate accounts), EventBridge schedules (weekday/session cron, with the calendar gate enforced in-handler), Secrets Manager, alarms.
+7. **CDK deployment** ✅ — parameterized `TradingBotStack` (paper + live), container-image Lambda (`trading_bot.aws.handler`), EventBridge schedules (weekday/session cron + MOC-backstop fire + near-close liquidation, calendar gate enforced in-handler), DynamoDB table, SSM config, SSM SecureString secrets (created out-of-band; Lambda granted read+KMS decrypt), CloudWatch alarms → SNS. `infra/` CDK app; `make deploy-paper`. EOD §5 now fully wired: engine places a resting MOC in the afternoon window (cancelling the bracket first) **and** force-liquidates near close.
 8. **Promote** — sustained paper runs → live at minimum size.
 
 ---

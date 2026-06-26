@@ -31,7 +31,11 @@ from trading_bot.broker.errors import (
     AccountModeMismatchError,
     BrokerError,
     BrokerNotConfiguredError,
+    DuplicateClientOrderIdError,
 )
+
+# Alpaca's error code (and message) for a re-used client_order_id.
+_DUPLICATE_COID_CODE = 40010001
 
 _STATUS_MAP: dict[str, OrderStatus] = {
     'new': OrderStatus.NEW,
@@ -97,6 +101,13 @@ def _i(value: Any) -> int:
 def _normalize_status(value: Any) -> OrderStatus:
     text = str(getattr(value, 'value', value)).rsplit('.', 1)[-1].lower()
     return _STATUS_MAP.get(text, OrderStatus.UNKNOWN)
+
+
+def _is_duplicate_client_order_id(exc: Any) -> bool:
+    """Detect Alpaca's re-used ``client_order_id`` rejection (by code or message)."""
+    if getattr(exc, 'code', None) == _DUPLICATE_COID_CODE:
+        return True
+    return 'client_order_id must be unique' in str(exc).lower()
 
 
 class AlpacaBroker(Broker):
@@ -183,7 +194,7 @@ class AlpacaBroker(Broker):
             stop_loss=sdk.StopLossRequest(stop_price=order.stop_loss_price),
             client_order_id=order.client_order_id,
         )
-        return self._to_order_result(self._client.submit_order(request))
+        return self._submit(request, order.client_order_id)
 
     def submit_moc_sell(self, symbol: str, qty: int, client_order_id: str) -> OrderResult:
         sdk = self._sdk
@@ -194,7 +205,23 @@ class AlpacaBroker(Broker):
             time_in_force=sdk.TimeInForce.CLS,  # market-on-close
             client_order_id=client_order_id,
         )
-        return self._to_order_result(self._client.submit_order(request))
+        return self._submit(request, client_order_id)
+
+    def _submit(self, request: Any, client_order_id: str) -> OrderResult:
+        """Submit an order, mapping a re-used id to ``DuplicateClientOrderIdError``.
+
+        The date-keyed id makes orders idempotent (DECISIONS.md §4): a duplicate
+        means the order already went in, which the engine handles by fetching the
+        existing order rather than re-ordering.
+        """
+        try:
+            return self._to_order_result(self._client.submit_order(request))
+        except self._sdk.APIError as exc:
+            if _is_duplicate_client_order_id(exc):
+                raise DuplicateClientOrderIdError(
+                    f'Order {client_order_id!r} already exists.'
+                ) from exc
+            raise
 
     def close_all_positions(self, *, cancel_orders: bool = True) -> list[OrderResult]:
         responses = self._client.close_all_positions(cancel_orders=cancel_orders)
