@@ -221,3 +221,9 @@ __marimo__/
 cdk.out/
 infra/cdk.out/
 .cdk.staging/
+
+# Generated run/advisory exports (repo root only — curated samples in examples/ are tracked)
+/paper_runs_*.txt
+/advisories_*.txt
+
+.DS_Store

@@ -1,0 +1,111 @@
+# Sample run logs — intraday momentum-rollover SELL
+
+[INFO]	2026-06-22T13:45:00.000Z	c53ca422-9732-423d-8caf-d2e17be01f7e
+{
+    "mode": "paper",
+    "trade_date": "2026-06-22",
+    "action": "BUY_BULLISH",
+    "reason": "BUY_BULLISH: 25 QQQ @ ~$400.00 (~$10,000), stop $396.00 (-1.00%, 1.0% floor), take $408.00.",
+    "status_before": "NO_POSITION",
+    "status_after": "POSITION_OPEN",
+    "alert": null,
+    "duration_ms": 1850.0
+}
+
+[INFO]	2026-06-22T14:30:00.000Z	2f9e2156-b5c7-4c4b-a3f2-cce829fd0d90
+{
+    "mode": "paper",
+    "trade_date": "2026-06-22",
+    "action": "HOLD",
+    "reason": "Holding QQQ (unrealized +0.50%); no exit trigger.",
+    "status_before": "POSITION_OPEN",
+    "status_after": "POSITION_OPEN",
+    "alert": null,
+    "duration_ms": 1850.0
+}
+
+[INFO]	2026-06-22T16:00:00.000Z	115943f6-c948-4b4b-99bd-1164e67d825d
+{
+    "mode": "paper",
+    "trade_date": "2026-06-22",
+    "action": "HOLD",
+    "reason": "Holding QQQ (unrealized +0.75%); no exit trigger.",
+    "status_before": "POSITION_OPEN",
+    "status_after": "POSITION_OPEN",
+    "alert": null,
+    "duration_ms": 1850.0
+}
+
+[INFO]	2026-06-22T17:30:00.000Z	9d82afe0-2611-45db-81cd-1ef62be9e652
+{
+    "mode": "paper",
+    "trade_date": "2026-06-22",
+    "action": "SELL",
+    "reason": "QQQ momentum rolled over (price $404.00 < vwap $405.00, macd_hist<0).",
+    "status_before": "POSITION_OPEN",
+    "status_after": "POSITION_CLOSED",
+    "alert": null,
+    "duration_ms": 1850.0
+}
+
+[INFO]	2026-06-22T18:00:00.000Z	4bbea4be-8be9-44f6-9990-72208512ee3d
+{
+    "mode": "paper",
+    "trade_date": "2026-06-22",
+    "action": "DO_NOTHING",
+    "reason": "Position closed for the day; nothing to do.",
+    "status_before": "POSITION_CLOSED",
+    "status_after": "POSITION_CLOSED",
+    "alert": null,
+    "duration_ms": 1850.0
+}
+
+# Sample run logs — EOD: resting MOC, then forced near-close SELL
+
+[INFO]	2026-06-23T13:45:00.000Z	e75702d1-a838-44a0-b074-e3934fa7cfe3
+{
+    "mode": "paper",
+    "trade_date": "2026-06-23",
+    "action": "BUY_BULLISH",
+    "reason": "BUY_BULLISH: 25 QQQ @ ~$400.00 (~$10,000), stop $396.00 (-1.00%, 1.0% floor), take $408.00.",
+    "status_before": "NO_POSITION",
+    "status_after": "POSITION_OPEN",
+    "alert": null,
+    "duration_ms": 1850.0
+}
+
+[INFO]	2026-06-23T15:00:00.000Z	0fdd8f9c-c610-4858-8978-8dfffeb02214
+{
+    "mode": "paper",
+    "trade_date": "2026-06-23",
+    "action": "HOLD",
+    "reason": "Holding QQQ (unrealized +0.25%); no exit trigger.",
+    "status_before": "POSITION_OPEN",
+    "status_after": "POSITION_OPEN",
+    "alert": null,
+    "duration_ms": 1850.0
+}
+
+[INFO]	2026-06-23T19:47:00.000Z	324c4cf2-f107-4333-842c-0dce47e59490
+{
+    "mode": "paper",
+    "trade_date": "2026-06-23",
+    "action": "MOC",
+    "reason": "EOD backstop: resting MOC sell for 25 QQQ (fills at the close); bracket legs cancelled.",
+    "status_before": "POSITION_OPEN",
+    "status_after": "POSITION_OPEN",
+    "alert": null,
+    "duration_ms": 1850.0
+}
+
+[INFO]	2026-06-23T19:56:00.000Z	0fa99b9c-4f3e-4b04-a2d7-acd794611e61
+{
+    "mode": "paper",
+    "trade_date": "2026-06-23",
+    "action": "SELL",
+    "reason": "At/after forced-exit 15:55 ET (now 15:56).",
+    "status_before": "POSITION_OPEN",
+    "status_after": "POSITION_CLOSED",
+    "alert": null,
+    "duration_ms": 1850.0
+}
